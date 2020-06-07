@@ -1,18 +1,18 @@
 #!/bin/sh
 # ------------------------------
-# Paper auto-updater
+# PaperMC auto-updater
 #
 # /runner/entrypoint
 # ------------------------------
 
 echo "> Querying for latest supported minecraft version..."
 
-LATEST_MC=$(wget -q -O- https://papermc.io/api/v1/paper | jq ".versions[0]" | sed 's/"//g')
+LATEST_MC=$(wget -q -O- https://papermc.io/api/v1/$PRODUCT | jq ".versions[0]" | sed 's/"//g')
 
 echo "> Found version $LATEST_MC! Downloading latest build..."
 
 
-wget -q -O /runner/paper.jar https://papermc.io/api/v1/paper/$LATEST_MC/latest/download
+wget -q -O /runner/app.jar https://papermc.io/api/v1/$PRODUCT/$LATEST_MC/latest/download
 
 if [ $? -eq 0 ]; then
 	echo "> Successfully downloaded! Starting..."
@@ -20,6 +20,6 @@ if [ $? -eq 0 ]; then
 	# possible to override arguments
 	/runner/runner $@
 else
-	echo "> Failed to download paper. Exiting..."
+	echo "> Failed to download $PRODUCT. Exiting..."
 	exit 1
 fi
