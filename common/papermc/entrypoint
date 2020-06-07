@@ -7,11 +7,20 @@
 
 echo "> Welcome! using product: $PRODUCT"
 
-echo "> Querying for latest supported minecraft version..."
+echo "> Checking if the OVERRIDE_VERSION env variable was set..."
 
-LATEST_MC=$(wget -q -O- https://papermc.io/api/v1/$PRODUCT | jq ".versions[0]" | sed 's/"//g')
+if [ -z ${OVERRIDE_VERSION+x} ];
+then
+	# Variable is not set.
+	echo "> Variable not set, querying for latest supported minecraft version..."
+	LATEST_MC=$(wget -q -O- https://papermc.io/api/v1/$PRODUCT | jq ".versions[0]" | sed 's/"//g')
+	echo "> Found version $LATEST_MC! Downloading latest build..."
+else
+	# Variable is set.
+	echo "> Override Variable set! Using overridden version $OVERRIDE_VERSION"
+	LATEST_MC=$OVERRIDE_VERSION
+fi
 
-echo "> Found version $LATEST_MC! Downloading latest build..."
 
 
 wget -q -O /runner/app.jar https://papermc.io/api/v1/$PRODUCT/$LATEST_MC/latest/download
