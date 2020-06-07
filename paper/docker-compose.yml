@@ -3,7 +3,20 @@ version: "3.3"
 services:
   paper:
     image: "jcxldn/minecraft-runner:paper"
-    container_name: "paper"
+    container_name: "paper-latest"
+    command:
+      - "-Xmx1024M"
+      - "-Xms1024M"
+    ports:
+      - "25565:25565"
+    volumes:
+      - "./data:/data"
+  
+  paper2:
+    image: "jcxldn/minecraft-runner:paper"
+    container_name: "paper-1.15.2"
+    environment:
+      - OVERRIDE_VERSION=1.15.2
     command:
       - "-Xmx1024M"
       - "-Xms1024M"
