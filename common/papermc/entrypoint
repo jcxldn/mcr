@@ -5,6 +5,8 @@
 # /runner/entrypoint
 # ------------------------------
 
+echo "> Welcome! using product: $PRODUCT"
+
 echo "> Querying for latest supported minecraft version..."
 
 LATEST_MC=$(wget -q -O- https://papermc.io/api/v1/$PRODUCT | jq ".versions[0]" | sed 's/"//g')
