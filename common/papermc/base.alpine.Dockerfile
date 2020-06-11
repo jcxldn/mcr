@@ -1,12 +1,10 @@
 # jdk required for jlink to find required modules.
-# FROM adoptopenjdk/openjdk14:alpine-slim AS jlink
-
-FROM jcxldn/openjdk-alpine:14-jdk-slim as jlink
+FROM jcxldn/openjdk-alpine:14-jdk as jlink
 
 RUN apk add --no-cache ca-certificates \
 	&& wget -O app.jar https://papermc.io/api/v1/paper/1.15.2/latest/download \
 	&& wget -O 2.app.jar https://papermc.io/api/v1/waterfall/1.15/latest/download \
-	&& JDEPS=$(jdeps --multi-release 14 app.jar 2.app.jar | grep "app.jar -> " | cut -f3 -d " " | grep -v "not" | sed ':a;N;$!ba;s/\n/,/g') \
+	&& JDEPS=$(jdeps --ignore-missing-deps --list-deps --multi-release 14 app.jar 2.app.jar | awk -F'/' '{print $1}' | tr -d '[[:blank:]]' | sed ':a;N;$!ba;s/\n/,/g') \
 	&& echo "Found deps: $JDEPS" \
 	&& jlink --compress=2 --module-path /opt/java/openjdk/jmods --add-modules $JDEPS --output /jlinked
 
@@ -132,9 +130,13 @@ RUN export GLIBC_VERSION="2.31-r1"; \
 		rm -rf /tmp/zlib; \
 		
 		# PaperMC Base
-		apk add --no-cache wget jq; \ 
+		apk add --no-cache ca-certificates wget jq; \ 
 		chmod +x /runner/entrypoint; \
 		chmod +x /runner/runner;
+
+COPY --from=jlink /jlinked /opt/jdk/
+
+ENV PATH="/opt/jdk/bin:${PATH}"
 
 WORKDIR /data
 
