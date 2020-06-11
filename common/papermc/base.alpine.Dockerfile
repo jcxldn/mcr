@@ -4,9 +4,10 @@ FROM jcxldn/openjdk-alpine:14-jdk as jlink
 RUN apk add --no-cache ca-certificates \
 	&& wget -O app.jar https://papermc.io/api/v1/paper/1.15.2/latest/download \
 	&& wget -O 2.app.jar https://papermc.io/api/v1/waterfall/1.15/latest/download \
-	&& JDEPS=$(jdeps --ignore-missing-deps --list-deps --multi-release 14 app.jar 2.app.jar | awk -F'/' '{print $1}' | tr -d '[[:blank:]]' | sed ':a;N;$!ba;s/\n/,/g') \
+	# 'jdk.zipfs' - required for Spigot.
+	&& JDEPS=jdk.zipfs,$(jdeps --ignore-missing-deps --list-deps --multi-release 14 app.jar 2.app.jar | awk -F'/' '{print $1}' | tr -d '[[:blank:]]' | sed ':a;N;$!ba;s/\n/,/g') \
 	&& echo "Found deps: $JDEPS" \
-	&& jlink --compress=2 --module-path /opt/java/openjdk/jmods --add-modules $JDEPS --output /jlinked
+	&& jlink --no-header-files --no-man-pages --compress=2 --strip-debug --module-path /opt/java/openjdk/jmods --add-modules $JDEPS --output /jlinked
 
 
 # Based on "docker.io/jcxldn/openjdk-alpine:14-jre", but without java.
