@@ -64,23 +64,27 @@ jobs:
         name: List Available platforms
         run: echo ${{ steps.buildx.outputs.platforms }}
       -
+        # linux/arm64 is disabled due to a bug with java 14
+        # - OpenJDK Bug Status:  https://bugs.openjdk.java.net/browse/JDK-8236847
+        # - GitHub Actions run (to see error in action): https://github.com/Prouser123/minecraft-runner-docker/runs/762175797
+        # This must be fixed upstream.
         name: Run Buildx (base-papermc-alpine)
         run: |
           docker buildx build \
-            --platform linux/amd64,linux/arm64,linux/armhf \
+            --platform linux/amd64,linux/armhf \
             --output "type=image,push=true" \
             -f common/papermc/base.alpine.Dockerfile -t jcxldn/minecraft-runner:base-papermc-alpine .
       -
         name: Run Buildx (paper-alpine)
         run: |
           docker buildx build \
-            --platform linux/amd64,linux/arm64,linux/armhf \
+            --platform linux/amd64,linux/armhf \
             --output "type=image,push=true" \
             -f paper/alpine.Dockerfile -t jcxldn/minecraft-runner:paper-alpine .
       -
         name: Run Buildx (waterfall-alpine)
         run: |
           docker buildx build \
-            --platform linux/amd64,linux/arm64,linux/armhf \
+            --platform linux/amd64,linux/armhf \
             --output "type=image,push=true" \
             -f waterfall/alpine.Dockerfile -t jcxldn/minecraft-runner:waterfall-alpine .
