@@ -5,16 +5,38 @@
 # /runner/entrypoint
 # ------------------------------
 
-echo "> Downloading latest build..."
+# default auto-updating JAR path.
+JAR_PATH="/runner/app.jar"
 
-wget -q -O /runner/app.jar https://ci.nukkitx.com/job/GeyserMC/job/Geyser/job/master/lastSuccessfulBuild/artifact/bootstrap/standalone/target/Geyser.jar
+JVM_OPTS="$@ $JVM_OPTS "
 
-if [ $? -eq 0 ]; then
-	echo "> Successfully downloaded! Starting..."
-	echo ""
-	# possible to override arguments
-	/runner/runner $@
+echo "[Entrypoint] Found JVM Options: '$JVM_OPTS'"
+echo "[Entrypoint] Found Application Options: '$APP_OPTS'"
+
+echo "> Welcome!"
+
+echo "> Checking if OVERRIDE_JAR_PATH env variable was set..."
+
+if [ -n "$OVERRIDE_JAR_PATH" ];
+then
+	# Variable was set, skip the download and pass the variable to the runner.
+	echo "> OVERRIDE_JAR_PATH found! ('${OVERRIDE_JAR_PATH}') Starting..."
+	JAR_PATH=$OVERRIDE_JAR_PATH
+	# source runner to pass through env vars
+	. /runner/runner
 else
-	echo "> Failed to download Geyser. Exiting..."
-	exit 1
+
+	echo "> Downloading latest build..."
+
+	wget -q -O /runner/app.jar https://ci.nukkitx.com/job/GeyserMC/job/Geyser/job/master/lastSuccessfulBuild/artifact/bootstrap/standalone/target/Geyser.jar
+
+	if [ $? -eq 0 ]; then
+		echo "> Successfully downloaded! Starting..."
+		echo ""
+		# source runner to pass through env vars
+		. /runner/runner
+	else
+		echo "> Failed to download Geyser. Exiting..."
+		exit 1
+	fi
 fi

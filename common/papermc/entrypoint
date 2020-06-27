@@ -5,32 +5,51 @@
 # /runner/entrypoint
 # ------------------------------
 
+# default auto-updating JAR path.
+JAR_PATH="/runner/app.jar"
+
+JVM_OPTS="$@ $JVM_OPTS "
+
+echo "[Entrypoint] Found JVM Options: '$JVM_OPTS'"
+echo "[Entrypoint] Found Application Options: '$APP_OPTS'"
+
 echo "> Welcome! using product: $PRODUCT"
 
-echo "> Checking if the OVERRIDE_VERSION env variable was set..."
+echo "> Checking if OVERRIDE_JAR_PATH env variable was set..."
 
-if [ -z ${OVERRIDE_VERSION+x} ];
+if [ -n "$OVERRIDE_JAR_PATH" ];
 then
-	# Variable is not set.
-	echo "> Variable not set, querying for latest supported minecraft version..."
-	LATEST_MC=$(wget -q -O- https://papermc.io/api/v1/$PRODUCT | jq ".versions[0]" | sed 's/"//g')
-	echo "> Found version $LATEST_MC! Downloading latest build..."
+	# Variable was set, skip the download and pass the variable to the runner.
+	echo "> OVERRIDE_JAR_PATH found! ('${OVERRIDE_JAR_PATH}') Starting..."
+	JAR_PATH=$OVERRIDE_JAR_PATH
+	# source runner to pass through env vars
+	. /runner/runner
 else
-	# Variable is set.
-	echo "> Override Variable set! Using overridden version $OVERRIDE_VERSION"
-	LATEST_MC=$OVERRIDE_VERSION
-fi
+	echo "> Checking if the OVERRIDE_VERSION env variable was set..."
+
+	if [ -z ${OVERRIDE_VERSION+x} ];
+	then
+		# Variable is not set.
+		echo "> Variable not set, querying for latest supported minecraft version..."
+		LATEST_MC=$(wget -q -O- https://papermc.io/api/v1/$PRODUCT | jq ".versions[0]" | sed 's/"//g')
+		echo "> Found version $LATEST_MC! Downloading latest build..."
+	else
+		# Variable is set.
+		echo "> Override Variable set! Using overridden version $OVERRIDE_VERSION"
+		LATEST_MC=$OVERRIDE_VERSION
+	fi
 
 
 
-wget -q -O /runner/app.jar https://papermc.io/api/v1/$PRODUCT/$LATEST_MC/latest/download
+	wget -q -O /runner/app.jar https://papermc.io/api/v1/$PRODUCT/$LATEST_MC/latest/download
 
-if [ $? -eq 0 ]; then
-	echo "> Successfully downloaded! Starting..."
-	echo ""
-	# possible to override arguments
-	/runner/runner $@
-else
-	echo "> Failed to download $PRODUCT. Exiting..."
-	exit 1
+	if [ $? -eq 0 ]; then
+		echo "> Successfully downloaded! Starting..."
+		echo ""
+		# source runner to pass through env vars
+		. /runner/runner
+	else
+		echo "> Failed to download $PRODUCT. Exiting..."
+		exit 1
+	fi
 fi
