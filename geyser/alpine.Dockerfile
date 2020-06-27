@@ -3,7 +3,7 @@ FROM jcxldn/openjdk-alpine:14-jdk as jlink
 
 RUN apk add --no-cache ca-certificates binutils \
 	&& wget -O app.jar https://ci.nukkitx.com/job/GeyserMC/job/Geyser/job/master/lastSuccessfulBuild/artifact/bootstrap/standalone/target/Geyser.jar \
-	&& JDEPS=$(jdeps --ignore-missing-deps --list-deps --multi-release 14 app.jar | awk -F'/' '{print $1}' | tr -d '[[:blank:]]' | sed ':a;N;$!ba;s/\n/,/g') \
+	&& JDEPS=jdk.crypto.ec,$(jdeps --ignore-missing-deps --list-deps --multi-release 14 app.jar | awk -F'/' '{print $1}' | tr -d '[[:blank:]]' | sed ':a;N;$!ba;s/\n/,/g') \
 	&& echo "Found deps: $JDEPS" \
 	&& jlink --no-header-files --no-man-pages --compress=2 --strip-debug --module-path /opt/java/openjdk/jmods --add-modules $JDEPS --output /jlinked
 
