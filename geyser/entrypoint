@@ -1,0 +1,20 @@
+#!/bin/sh
+# ------------------------------
+# GeyserMC auto-updater
+#
+# /runner/entrypoint
+# ------------------------------
+
+echo "> Downloading latest build..."
+
+wget -q -O /runner/app.jar https://ci.nukkitx.com/job/GeyserMC/job/Geyser/job/master/lastSuccessfulBuild/artifact/bootstrap/standalone/target/Geyser.jar
+
+if [ $? -eq 0 ]; then
+	echo "> Successfully downloaded! Starting..."
+	echo ""
+	# possible to override arguments
+	/runner/runner $@
+else
+	echo "> Failed to download Geyser. Exiting..."
+	exit 1
+fi

@@ -93,3 +93,10 @@ jobs:
             --platform linux/amd64 \
             --output "type=image,push=true" \
             -f waterfall/alpine.Dockerfile -t jcxldn/minecraft-runner:waterfall-alpine .
+      -
+        name: Run Buildx (geyser-alpine)
+        run: |
+          docker buildx build \
+            --platform linux/amd64 \
+            --output "type=image,push=true" \
+            -f geyser/alpine.Dockerfile -t jcxldn/minecraft-runner:geyser-alpine .
