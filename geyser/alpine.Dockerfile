@@ -15,6 +15,8 @@ FROM alpine:3.12
 COPY geyser/entrypoint /runner/entrypoint
 COPY common/papermc/runner /runner/runner
 
+COPY geyser/url_escape.sed /runner/url_escape.sed
+
 # Add glibc
 RUN export GLIBC_VERSION="2.31-r1"; \
 	mkdir -p /lib /lib64 /usr/glibc-compat/lib/locale /usr/glibc-compat/lib64 /etc; \

@@ -5,38 +5,55 @@
 # /runner/entrypoint
 # ------------------------------
 
+
 # default auto-updating JAR path.
 JAR_PATH="/runner/app.jar"
 
+# default repository branch to download from
+BRANCH="master"
+
 JVM_OPTS="$@ $JVM_OPTS "
 
-echo "[Entrypoint] Found JVM Options: '$JVM_OPTS'"
-echo "[Entrypoint] Found Application Options: '$APP_OPTS'"
+echo "entrypoint > Found JVM Options: '$JVM_OPTS'"
+echo "entrypoint > Found Application Options: '$APP_OPTS'"
 
-echo "> Welcome!"
+echo "entrypoint > Welcome!"
 
-echo "> Checking if OVERRIDE_JAR_PATH env variable was set..."
+echo "entrypoint > Checking if OVERRIDE_JAR_PATH env variable was set..."
 
 if [ -n "$OVERRIDE_JAR_PATH" ];
 then
 	# Variable was set, skip the download and pass the variable to the runner.
-	echo "> OVERRIDE_JAR_PATH found! ('${OVERRIDE_JAR_PATH}') Starting..."
+	echo "entrypoint > OVERRIDE_JAR_PATH found! ('${OVERRIDE_JAR_PATH}') Starting..."
 	JAR_PATH=$OVERRIDE_JAR_PATH
 	# source runner to pass through env vars
 	. /runner/runner
 else
 
-	echo "> Downloading latest build..."
+	# Check if an override branch was set
+	
+	echo "entrypoint > Checking if OVERRIDE_BRANCH env variable was set..."
+	
+	if [ -n "$OVERRIDE_BRANCH" ];
+	then
+		# Variable was set
+		echo "entrypoint > OVERRIDE_BRANCH found! ('${OVERRIDE_BRANCH}')"
+		BRANCH=$OVERRIDE_BRANCH
+	fi
 
-	wget -q -O /runner/app.jar https://ci.nukkitx.com/job/GeyserMC/job/Geyser/job/master/lastSuccessfulBuild/artifact/bootstrap/standalone/target/Geyser.jar
+	echo "entrypoint > Downloading latest build... (branch: '$BRANCH')"
+	
+	# echo "debug > '$(echo "${BRANCH}" | sed -f /runner/url_escape.sed)'"
+
+	wget -q -O /runner/app.jar https://ci.nukkitx.com/job/GeyserMC/job/Geyser/job/$(echo "${BRANCH}" | sed -f /runner/url_escape.sed)/lastSuccessfulBuild/artifact/bootstrap/standalone/target/Geyser.jar
 
 	if [ $? -eq 0 ]; then
-		echo "> Successfully downloaded! Starting..."
+		echo "entrypoint > Successfully downloaded! Starting..."
 		echo ""
 		# source runner to pass through env vars
 		. /runner/runner
 	else
-		echo "> Failed to download Geyser. Exiting..."
+		echo "entrypoint > Failed to download Geyser. Exiting..."
 		exit 1
 	fi
 fi
