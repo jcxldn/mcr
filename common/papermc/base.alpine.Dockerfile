@@ -5,7 +5,8 @@ RUN apk add --no-cache ca-certificates binutils \
 	&& wget -O app.jar https://papermc.io/api/v1/paper/1.15.2/latest/download \
 	&& wget -O 2.app.jar https://papermc.io/api/v1/waterfall/1.15/latest/download \
 	# 'jdk.zipfs' - required for Spigot.
-	&& JDEPS=jdk.zipfs,$(jdeps --ignore-missing-deps --list-deps --multi-release 14 app.jar 2.app.jar | awk -F'/' '{print $1}' | tr -d '[[:blank:]]' | sed ':a;N;$!ba;s/\n/,/g') \
+	# 'jdk.crypto.ec' - required for proper SSL/TLS support. - https://stackoverflow.com/questions/55439599/sslhandshakeexception-with-jlink-created-runtime
+	&& JDEPS=jdk.zipfs,jdk.crypto.ec,$(jdeps --ignore-missing-deps --list-deps --multi-release 14 app.jar 2.app.jar | awk -F'/' '{print $1}' | tr -d '[[:blank:]]' | sed ':a;N;$!ba;s/\n/,/g') \
 	&& echo "Found deps: $JDEPS" \
 	&& jlink --no-header-files --no-man-pages --compress=2 --strip-debug --module-path /opt/java/openjdk/jmods --add-modules $JDEPS --output /jlinked
 
