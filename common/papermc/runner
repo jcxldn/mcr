@@ -5,9 +5,9 @@
 # /runner/runner
 # ------------------------------
 
-echo "[Entrypoint] Found JAR Path: '$JAR_PATH'"
-echo "[Entrypoint] Found JVM Options: '$JVM_OPTS'"
-echo "[Entrypoint] Found Application Options: '$APP_OPTS'"
+echo "runner > Found JAR Path: '$JAR_PATH'"
+echo "runner > Found JVM Options: '$JVM_OPTS'"
+echo "runner > Found Application Options: '$APP_OPTS'"
 
 cd /data
 java -Dcom.mojang.eula.agree=true -server -XX:+UseG1GC -XX:+UnlockExperimentalVMOptions -XX:MaxGCPauseMillis=100 -XX:+DisableExplicitGC -XX:TargetSurvivorRatio=90 -XX:G1NewSizePercent=50 -XX:G1MaxNewSizePercent=80 -XX:G1MixedGCLiveThresholdPercent=35 -XX:+AlwaysPreTouch -XX:+ParallelRefProcEnabled -Dusing.aikars.flags=mcflags.emc.gs $JVM_OPTS -jar $JAR_PATH $APP_OPTS
