@@ -6,8 +6,8 @@ RUN apk add --no-cache ca-certificates binutils \
 	&& wget -O 2.app.jar https://papermc.io/api/v1/waterfall/1.15/latest/download \
 	# 'jdk.zipfs' - required for Spigot.
 	# 'jdk.crypto.ec' - required for proper SSL/TLS support. - https://stackoverflow.com/questions/55439599/sslhandshakeexception-with-jlink-created-runtime
-	# 'java.scripting' - required for MultiVerse support - https://github.com/dumptruckman/Buscript/blob/master/src/main/java/buscript/ScriptManager.java
-	&& JDEPS=jdk.zipfs,jdk.crypto.ec,java.scripting,$(jdeps --ignore-missing-deps --list-deps --multi-release 14 app.jar 2.app.jar | awk -F'/' '{print $1}' | tr -d '[[:blank:]]' | sed ':a;N;$!ba;s/\n/,/g') \
+	# 'java.scripting,jdk.scripting.nashorn' - required for MultiVerse support - https://github.com/dumptruckman/Buscript/blob/master/src/main/java/buscript/ScriptManager.java
+	&& JDEPS=jdk.zipfs,jdk.crypto.ec,java.scripting,jdk.scripting.nashorn,$(jdeps --ignore-missing-deps --list-deps --multi-release 14 app.jar 2.app.jar | awk -F'/' '{print $1}' | tr -d '[[:blank:]]' | sed ':a;N;$!ba;s/\n/,/g') \
 	&& echo "Found deps: $JDEPS" \
 	&& jlink --no-header-files --no-man-pages --compress=2 --strip-debug --module-path /opt/java/openjdk/jmods --add-modules $JDEPS --output /jlinked
 
