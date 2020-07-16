@@ -17,7 +17,7 @@ echo "entrypoint > Welcome! using product: $PRODUCT"
 
 echo "entrypoint > Checking if OVERRIDE_JAR_PATH env variable was set..."
 
-if [ -n "$OVERRIDE_JAR_PATH" ];
+if [ ! -z"$OVERRIDE_JAR_PATH" ];
 then
 	# Variable was set, skip the download and pass the variable to the runner.
 	echo "entrypoint > OVERRIDE_JAR_PATH found! ('${OVERRIDE_JAR_PATH}') Starting..."
@@ -27,7 +27,7 @@ then
 else
 	echo "entrypoint > Checking if the OVERRIDE_VERSION env variable was set..."
 
-	if [ -z ${OVERRIDE_VERSION+x} ];
+	if [ -z ${OVERRIDE_VERSION} ];
 	then
 		# Variable is not set.
 		echo "entrypoint > Variable not set, querying for latest supported minecraft version..."
@@ -41,7 +41,7 @@ else
 	
 	echo "entrypoint > Checking if the OVERRIDE_JAR_DL_PATH env variable was set..."
 	
-	if [ -z ${OVERRIDE_JAR_DL_PATH+x} ];
+	if [ -z ${OVERRIDE_JAR_DL_PATH} ];
 	then
 		# Variable is not set
 		echo "entrypoint > Variable not set, using default ($JAR_PATH)..."
