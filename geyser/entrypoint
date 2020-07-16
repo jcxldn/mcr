@@ -21,7 +21,7 @@ echo "entrypoint > Welcome!"
 
 echo "entrypoint > Checking if OVERRIDE_JAR_PATH env variable was set..."
 
-if [ -n "$OVERRIDE_JAR_PATH" ];
+if [ ! -z "$OVERRIDE_JAR_PATH" ];
 then
 	# Variable was set, skip the download and pass the variable to the runner.
 	echo "entrypoint > OVERRIDE_JAR_PATH found! ('${OVERRIDE_JAR_PATH}') Starting..."
@@ -34,7 +34,7 @@ else
 	
 	echo "entrypoint > Checking if OVERRIDE_BRANCH env variable was set..."
 	
-	if [ -n "$OVERRIDE_BRANCH" ];
+	if [ ! -z "$OVERRIDE_BRANCH" ];
 	then
 		# Variable was set
 		echo "entrypoint > OVERRIDE_BRANCH found! ('${OVERRIDE_BRANCH}')"
@@ -43,7 +43,7 @@ else
 	
 	echo "entrypoint > Checking if the OVERRIDE_JAR_DL_PATH env variable was set..."
 
-	if [ -z ${OVERRIDE_JAR_DL_PATH+x} ];
+	if [ -z ${OVERRIDE_JAR_DL_PATH} ];
 	then
 		# Variable is not set
 		echo "entrypoint > Variable not set, using default ($JAR_PATH)..."
