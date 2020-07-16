@@ -40,12 +40,24 @@ else
 		echo "entrypoint > OVERRIDE_BRANCH found! ('${OVERRIDE_BRANCH}')"
 		BRANCH=$OVERRIDE_BRANCH
 	fi
+	
+	echo "entrypoint > Checking if the OVERRIDE_JAR_DL_PATH env variable was set..."
+
+	if [ -z ${OVERRIDE_JAR_DL_PATH+x} ];
+	then
+		# Variable is not set
+		echo "entrypoint > Variable not set, using default ($JAR_PATH)..."
+	else
+		# Variable is set.
+		echo "entrypoint > Override Variable set! Using overriden JAR download path '$OVERRIDE_JAR_DL_PATH'"
+		JAR_PATH=$OVERRIDE_JAR_DL_PATH	
+	fi
 
 	echo "entrypoint > Downloading latest build... (branch: '$BRANCH')"
 	
 	# echo "debug > '$(echo "${BRANCH}" | sed -f /runner/url_escape.sed)'"
 
-	wget -q -O /runner/app.jar https://ci.nukkitx.com/job/GeyserMC/job/Geyser/job/$(echo "${BRANCH}" | sed -f /runner/url_escape.sed)/lastSuccessfulBuild/artifact/bootstrap/standalone/target/Geyser.jar
+	wget -q -O $JAR_PATH https://ci.nukkitx.com/job/GeyserMC/job/Geyser/job/$(echo "${BRANCH}" | sed -f /runner/url_escape.sed)/lastSuccessfulBuild/artifact/bootstrap/standalone/target/Geyser.jar
 
 	if [ $? -eq 0 ]; then
 		echo "entrypoint > Successfully downloaded! Starting..."
