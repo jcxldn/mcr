@@ -8,8 +8,6 @@
 # default auto-updating JAR path.
 JAR_PATH="/runner/app.jar"
 
-JAR_DL_PATH=$JAR_PATH # same value for defaults
-
 JVM_OPTS="$@ $JVM_OPTS "
 
 echo "entrypoint > Found JVM Options: '$JVM_OPTS'"
@@ -46,14 +44,14 @@ else
 	if [ -z ${OVERRIDE_JAR_DL_PATH+x} ];
 	then
 		# Variable is not set
-		echo "entrypoint > Variable not set, using default ($JAR_DL_PATH)..."
+		echo "entrypoint > Variable not set, using default ($JAR_PATH)..."
 	else
 		# Variable is set.
 		echo "entrypoint > Override Variable set! Using overriden JAR download path '$OVERRIDE_JAR_DL_PATH'"
-		JAR_DL_PATH=$OVERRIDE_JAR_DL_PATH	
+		JAR_PATH=$OVERRIDE_JAR_DL_PATH	
 	fi
 	
-	wget -q -O $JAR_DL_PATH https://papermc.io/api/v1/$PRODUCT/$LATEST_MC/latest/download
+	wget -q -O $JAR_PATH https://papermc.io/api/v1/$PRODUCT/$LATEST_MC/latest/download
 
 	if [ $? -eq 0 ]; then
 		echo "entrypoint > Successfully downloaded! Starting..."
