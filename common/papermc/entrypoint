@@ -10,6 +10,8 @@ JAR_PATH="/runner/app.jar"
 
 JVM_OPTS="$@ $JVM_OPTS "
 
+echo "entrypoint > In directory: '$(pwd)'"
+
 echo "entrypoint > Found JVM Options: '$JVM_OPTS'"
 echo "entrypoint > Found Application Options: '$APP_OPTS'"
 
@@ -20,7 +22,7 @@ echo "entrypoint > Checking if OVERRIDE_JAR_PATH env variable was set..."
 if [ ! -z"$OVERRIDE_JAR_PATH" ];
 then
 	# Variable was set, skip the download and pass the variable to the runner.
-	echo "entrypoint > OVERRIDE_JAR_PATH found! ('${OVERRIDE_JAR_PATH}') Starting..."
+	echo "entrypoint > OVERRIDE_JAR_PATH found! ('${OVERRIDE_JAR_PATH}') Starting... (in directory '$(pwd)')"
 	JAR_PATH=$OVERRIDE_JAR_PATH
 	# source runner to pass through env vars
 	. /runner/runner
@@ -54,7 +56,7 @@ else
 	wget -q -O $JAR_PATH https://papermc.io/api/v1/$PRODUCT/$LATEST_MC/latest/download
 
 	if [ $? -eq 0 ]; then
-		echo "entrypoint > Successfully downloaded! Starting..."
+		echo "entrypoint > Successfully downloaded! Starting... (in directory '$(pwd)')"
 		echo ""
 		# source runner to pass through env vars
 		. /runner/runner
