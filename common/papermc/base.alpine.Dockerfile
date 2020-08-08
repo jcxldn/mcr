@@ -132,8 +132,8 @@ RUN export GLIBC_VERSION="2.31-r1"; \
 		rm -rf /var/cache/apk/*; \
 		rm -rf /tmp/zlib; \
 		
-		# PaperMC Base
-		apk add --no-cache ca-certificates wget jq; \ 
+		# PaperMC Base (08/08/2020 - added libstdc++ as otherwise waterfall complains!) 
+		apk add --no-cache ca-certificates wget jq libstdc++; \ 
 		chmod +x /runner/entrypoint; \
 		chmod +x /runner/runner;
 
