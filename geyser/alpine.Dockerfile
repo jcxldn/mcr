@@ -6,7 +6,7 @@ RUN java -Xshare:dump \
 	&& wget -O app.jar https://ci.nukkitx.com/job/GeyserMC/job/Geyser/job/master/lastSuccessfulBuild/artifact/bootstrap/standalone/target/Geyser.jar \
 	&& JDEPS=jdk.crypto.ec,$(jdeps --ignore-missing-deps --list-deps --multi-release 14 app.jar | awk -F'/' '{print $1}' | tr -d '[[:blank:]]' | sed ':a;N;$!ba;s/\n/,/g') \
 	&& echo "Found deps: $JDEPS" \
-	&& jlink --no-header-files --no-man-pages --compress=2 --strip-debug --module-path /opt/java/openjdk/jmods --add-modules $JDEPS --output /jlinked
+	&& jlink -Djdk.lang.Process.launchMechanism=vfork --no-header-files --no-man-pages --compress=2 --strip-debug --module-path /opt/java/openjdk/jmods --add-modules $JDEPS --output /jlinked
 
 
 # Based on "docker.io/jcxldn/openjdk-alpine:14-jre", but without java.
