@@ -127,13 +127,31 @@ RUN export GLIBC_VERSION="2.31-r1"; \
 		rm -rf /usr/glibc-compat/*/*.o; \
 		rm -rf /usr/glibc-compat/*/*.a; \
 		
+		# 08/08/2020 hotfix for waterfall - added libstdc++ and libgcc and symlink
+		# ----- Hotfix Start -----
+ 
+		# Install libs
+		apk add --no-cache libstdc++ libgcc; \
+		
+		# Strip libs to save space
+		strip /usr/lib/libstdc++.so.6; \
+		strip /usr/lib/libgcc_s.so.1; \
+		
+		# Link libs to other lib folders
+		ln -sfn /usr/lib/libstdc++.so.6 /usr/glibc-compat/lib; \
+		ln -sfn /usr/lib/libstdc++.so.6 /lib; \
+		
+		ln -sfn /usr/lib/libgcc_s.so.1 /usr/glibc-compat/lib; \
+		ln -sfn /usr/lib/libgcc_s.so.1 /lib; \
+		# ----- Hotfix End -----
+		
 		# Cleaning up...
 		apk del --purge .fetch-deps; \
 		rm -rf /var/cache/apk/*; \
 		rm -rf /tmp/zlib; \
 		
-		# PaperMC Base (08/08/2020 - added libstdc++ as otherwise waterfall complains!) 
-		apk add --no-cache ca-certificates wget jq libstdc++; \ 
+		# PaperMC Base
+		apk add --no-cache ca-certificates wget jq; \ 
 		chmod +x /runner/entrypoint; \
 		chmod +x /runner/runner;
 
