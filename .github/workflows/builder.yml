@@ -71,27 +71,27 @@ jobs:
         name: Run Buildx (base-papermc-alpine)
         run: |
           docker buildx build \
-            --platform linux/amd64, linux/arm64 \
+            --platform linux/amd64,linux/arm64 \
             --output "type=image,push=$([[ $GITHUB_REF == "refs/heads/master" ]] && echo true || echo false)" \
             -f common/papermc/base.alpine.Dockerfile -t jcxldn/minecraft-runner:base-papermc-alpine .
       -
         name: Run Buildx (paper-alpine)
         run: |
           docker buildx build \
-            --platform linux/amd64, linux/arm64 \
+            --platform linux/amd64,linux/arm64 \
             --output "type=image,push=$([[ $GITHUB_REF == "refs/heads/master" ]] && echo true || echo false)" \
             -f paper/alpine.Dockerfile -t jcxldn/minecraft-runner:paper-alpine .
       -
         name: Run Buildx (waterfall-alpine)
         run: |
           docker buildx build \
-            --platform linux/amd64, linux/arm64 \
+            --platform linux/amd64,linux/arm64 \
             --output "type=image,push=$([[ $GITHUB_REF == "refs/heads/master" ]] && echo true || echo false)" \
             -f waterfall/alpine.Dockerfile -t jcxldn/minecraft-runner:waterfall-alpine .
       -
         name: Run Buildx (geyser-alpine)
         run: |
           docker buildx build \
-            --platform linux/amd64, linux/arm64 \
+            --platform linux/amd64,linux/arm64 \
             --output "type=image,push=$([[ $GITHUB_REF == "refs/heads/master" ]] && echo true || echo false)" \
             -f geyser/alpine.Dockerfile -t jcxldn/minecraft-runner:geyser-alpine .
