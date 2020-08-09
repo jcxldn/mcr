@@ -1,11 +1,13 @@
 # jdk required for jlink to find required modules.
 FROM jcxldn/openjdk-alpine:14-jdk as jlink
 
+# Recreate CDS Cache
 RUN java -Xshare:dump \
 	&& apk add --no-cache ca-certificates binutils \
 	&& wget -O app.jar https://ci.nukkitx.com/job/GeyserMC/job/Geyser/job/master/lastSuccessfulBuild/artifact/bootstrap/standalone/target/Geyser.jar \
 	&& JDEPS=jdk.crypto.ec,$(jdeps --ignore-missing-deps --list-deps --multi-release 14 app.jar | awk -F'/' '{print $1}' | tr -d '[[:blank:]]' | sed ':a;N;$!ba;s/\n/,/g') \
 	&& echo "Found deps: $JDEPS" \
+	# Set java option to prevent 'exec spawn helper' error > https://stackoverflow.com/questions/61301818/java-failed-to-exec-spawn-helper-error-since-moving-to-java-14-on-linux
 	&& _JAVA_OPTIONS="-Djdk.lang.Process.launchMechanism=vfork" jlink  --no-header-files --no-man-pages --compress=2 --strip-debug --module-path /opt/java/openjdk/jmods --add-modules $JDEPS --output /jlinked
 
 
