@@ -1,7 +1,8 @@
 # jdk required for jlink to find required modules.
 FROM jcxldn/openjdk-alpine:14-jdk as jlink
 
-RUN apk add --no-cache ca-certificates binutils \
+RUN java -Xshare:dump \
+	&& apk add --no-cache ca-certificates binutils \
 	&& wget -O app.jar https://papermc.io/api/v1/paper/1.15.2/latest/download \
 	&& wget -O 2.app.jar https://papermc.io/api/v1/waterfall/1.15/latest/download \
 	# 'jdk.zipfs' - required for Spigot.
