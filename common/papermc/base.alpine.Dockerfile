@@ -10,7 +10,7 @@ RUN java -Xshare:dump \
 	# 'java.scripting,jdk.scripting.nashorn' - required for MultiVerse support - https://github.com/dumptruckman/Buscript/blob/master/src/main/java/buscript/ScriptManager.java
 	&& JDEPS=jdk.zipfs,jdk.crypto.ec,java.scripting,jdk.scripting.nashorn,$(jdeps --ignore-missing-deps --list-deps --multi-release 14 app.jar 2.app.jar | awk -F'/' '{print $1}' | tr -d '[[:blank:]]' | sed ':a;N;$!ba;s/\n/,/g') \
 	&& echo "Found deps: $JDEPS" \
-	&& PATH="/opt/jdk/lib:$PATH" jlink --no-header-files --no-man-pages --compress=2 --strip-debug --module-path /opt/java/openjdk/jmods --add-modules $JDEPS --output /jlinked
+	&& chmod 755 /opt/jdk/lib/jspawnhelper && PATH="/opt/jdk/lib:$PATH" jlink --no-header-files --no-man-pages --compress=2 --strip-debug --module-path /opt/java/openjdk/jmods --add-modules $JDEPS --output /jlinked
 
 
 # Based on "docker.io/jcxldn/openjdk-alpine:14-jre", but without java.
