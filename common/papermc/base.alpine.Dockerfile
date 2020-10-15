@@ -8,9 +8,9 @@ RUN java -Xshare:dump \
 	&& wget -O 2.app.jar https://papermc.io/api/v1/waterfall/1.15/latest/download \
 	# 'jdk.zipfs' - required for Spigot.
 	# 'jdk.crypto.ec' - required for proper SSL/TLS support. - https://stackoverflow.com/questions/55439599/sslhandshakeexception-with-jlink-created-runtime
-	# 'java.scripting,jdk.scripting.nashorn' - required for MultiVerse support - https://github.com/dumptruckman/Buscript/blob/master/src/main/java/buscript/ScriptManager.java
+	# 'java.scripting' - required for MultiVerse support - https://github.com/dumptruckman/Buscript/blob/master/src/main/java/buscript/ScriptManager.java
 	# 'jdk.management' - required for Spark Profiler <https://github.com/lucko/spark>
-	&& JDEPS=jdk.zipfs,jdk.crypto.ec,java.scripting,jdk.scripting.nashorn,jdk.management,$(jdeps --ignore-missing-deps --list-deps --multi-release 15 app.jar 2.app.jar | awk -F'/' '{print $1}' | tr -d '[[:blank:]]' | sed ':a;N;$!ba;s/\n/,/g') \
+	&& JDEPS=jdk.zipfs,jdk.crypto.ec,java.scripting,jdk.management,$(jdeps --ignore-missing-deps --list-deps --multi-release 15 app.jar 2.app.jar | awk -F'/' '{print $1}' | tr -d '[[:blank:]]' | sed ':a;N;$!ba;s/\n/,/g') \
 	&& echo "Found deps: $JDEPS" \
 	# Set java option to prevent 'exec spawn helper' error > https://stackoverflow.com/questions/61301818/java-failed-to-exec-spawn-helper-error-since-moving-to-java-14-on-linux
 	&& _JAVA_OPTIONS="-Djdk.lang.Process.launchMechanism=vfork" jlink  --no-header-files --no-man-pages --compress=2 --strip-debug --module-path /opt/java/openjdk/jmods --add-modules $JDEPS --output /jlinked
