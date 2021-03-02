@@ -85,6 +85,13 @@ jobs:
             --output "type=image,push=$([[ $GITHUB_REF == "refs/heads/master" ]] && echo true || echo false)" \
             -f waterfall/alpine.Dockerfile -t jcxldn/minecraft-runner:waterfall-alpine .
       -
+        name: Run Buildx (purpur-alpine)
+        run: |
+          docker buildx build \
+            --platform linux/amd64,linux/arm64,linux/arm/v7 \
+            --output "type=image,push=$([[ $GITHUB_REF == "refs/heads/master" ]] && echo true || echo false)" \
+            -f purpur/alpine.Dockerfile -t jcxldn/minecraft-runner:purpur-alpine .
+      -
         name: Run Buildx (geyser-alpine)
         run: |
           docker buildx build \
