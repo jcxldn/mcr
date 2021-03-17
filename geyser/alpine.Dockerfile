@@ -1,5 +1,5 @@
 # jdk required for jlink to find required modules.
-FROM jcxldn/openjdk-alpine:14-jdk as jlink
+FROM jcxldn/openjdk-alpine:16-jdk as jlink
 
 # Recreate CDS Cache
 RUN java -Xshare:dump \

@@ -1,5 +1,5 @@
 # jdk required for jlink to find required modules.
-FROM jcxldn/openjdk-alpine:14-jdk as jlink
+FROM jcxldn/openjdk-alpine:16-jdk as jlink
 
 # Recreate CDS Cache
 RUN java -Xshare:dump \
@@ -120,7 +120,7 @@ RUN export GLIBC_VERSION="2.31-r1"; \
 		strip /usr/glibc-compat/lib/*/* || echo 'Probably done with errors'; \
 		
 		# Remove unused files (https://github.com/sgerrand/alpine-pkg-glibc/blob/master/APKBUILD)
-		rm "$pkgdir"/usr/glibc-compat/etc/rpc; \
+		rm /usr/glibc-compat/etc/rpc; \
 		rm -rf /usr/glibc-compat/bin; \
 		rm -rf /usr/glibc-compat/sbin; \
 		rm -rf /usr/glibc-compat/lib/gconv; \
