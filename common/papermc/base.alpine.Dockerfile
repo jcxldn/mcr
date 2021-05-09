@@ -30,7 +30,7 @@ RUN apk add --no-cache git \
 
 FROM alpine:3.12
 
-COPY common/papermc/ /runner/entrypoint
+COPY common/papermc/entrypoint /runner/entrypoint
 COPY common/papermc/runner /runner/runner
 COPY common/papermc/healthcheck /runner/healthcheck
 
