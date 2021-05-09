@@ -19,7 +19,7 @@ then
     # Note: there is a -timeout flag but i'm not sure how well it works
     /sbin/mc-monitor status -port $PORT
     exit $?
-elif [ "$PRODUCT" == "waterfall"];
+elif [ "$PRODUCT" == "waterfall" ];
 then
     echo "Found waterfall-compatible platform!"
     echo "Searching for server-port"
