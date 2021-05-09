@@ -18,12 +18,20 @@ RUN java -Xshare:dump \
 	&& _JAVA_OPTIONS="-Djdk.lang.Process.launchMechanism=vfork" jlink  --no-header-files --no-man-pages --compress=2 --strip-debug --module-path /opt/java/openjdk/jmods --add-modules $JDEPS --output /jlinked
 
 
+# mc-monitor go binary for docker healthchecking
+FROM golang:alpine as mcmonitor
+
+RUN apk add --no-cache git upx \
+    && git clone --depth 1 -b 0.8.0 https://github.com/itzg/mc-monitor \
+    && cd mc-monitor \
+    && GOOS=linux go build -ldflags="-s -w" \
+    && upx --brute mc-monitor
+
 # Based on "docker.io/jcxldn/openjdk-alpine:14-jre", but without java.
 
 FROM alpine:3.12
 
-COPY common/papermc/entrypoint /runner/entrypoint
-COPY common/papermc/runner /runner/runner
+COPY common/papermc/ /runner
 
 # Add glibc
 RUN export GLIBC_VERSION="2.31-r1"; \
@@ -165,12 +173,15 @@ RUN export GLIBC_VERSION="2.31-r1"; \
 		chmod +x /runner/runner;
 
 COPY --from=jlink /jlinked /opt/jdk/
+COPY --from=mcmonitor /go/mc-monitor/mc-monitor /sbin/
 
 ENV PATH="/opt/jdk/bin:${PATH}"
 
 WORKDIR /data
 
 ENTRYPOINT ["/runner/entrypoint"]
+
+HEALTHCHECK --start-period=1m CMD /runner/healthcheck
 
 # docker run [..] -v ./data:/data -Xmx1024M -Xms1024M
 # All optimizations and auto-updating jar included.
