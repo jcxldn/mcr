@@ -21,17 +21,18 @@ RUN java -Xshare:dump \
 # mc-monitor go binary for docker healthchecking
 FROM golang:alpine as mcmonitor
 
-RUN apk add --no-cache git upx \
+RUN apk add --no-cache git \
     && git clone --depth 1 -b 0.8.0 https://github.com/itzg/mc-monitor \
     && cd mc-monitor \
-    && GOOS=linux go build -ldflags="-s -w" \
-    && upx --brute mc-monitor
+    && GOOS=linux go build -ldflags="-s -w"
 
 # Based on "docker.io/jcxldn/openjdk-alpine:14-jre", but without java.
 
 FROM alpine:3.12
 
-COPY common/papermc/ /runner
+COPY common/papermc/ /runner/entrypoint
+COPY common/papermc/runner /runner/runner
+COPY common/papermc/healthcheck /runner/healthcheck
 
 # Add glibc
 RUN export GLIBC_VERSION="2.31-r1"; \
