@@ -171,7 +171,8 @@ RUN export GLIBC_VERSION="2.31-r1"; \
 		# PaperMC Base
 		apk add --no-cache ca-certificates wget jq; \ 
 		chmod +x /runner/entrypoint; \
-		chmod +x /runner/runner;
+		chmod +x /runner/runner; \
+		chmod +x /runner/healthcheck;
 
 COPY --from=jlink /jlinked /opt/jdk/
 COPY --from=mcmonitor /go/mc-monitor/mc-monitor /sbin/
