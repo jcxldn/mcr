@@ -19,7 +19,7 @@ echo "entrypoint > Welcome! using product: $PRODUCT"
 
 echo "entrypoint > Checking if OVERRIDE_JAR_PATH env variable was set..."
 
-if [ ! -z"$OVERRIDE_JAR_PATH" ];
+if [ ! -z ${OVERRIDE_JAR_PATH} ];
 then
 	# Variable was set, skip the download and pass the variable to the runner.
 	echo "entrypoint > OVERRIDE_JAR_PATH found! ('${OVERRIDE_JAR_PATH}') Starting... (in directory '$(pwd)')"
