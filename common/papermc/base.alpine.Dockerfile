@@ -24,7 +24,9 @@ WORKDIR /src
 
 COPY dltool/ .
 
-RUN go build -ldflags "-s -w" -o /dist/dltool
+# Build dltool and make sure it runs properly
+RUN go build -ldflags "-s -w" -o /dist/dltool; \
+	/dist/dltool
 
 # Based on "docker.io/jcxldn/openjdk-alpine:14-jre", but without java.
 
