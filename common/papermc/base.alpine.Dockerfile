@@ -12,11 +12,21 @@ RUN java -Xshare:dump \
 	# 'jdk.management' - required for Spark Profiler <https://github.com/lucko/spark>
 	# 'jdk.management.agent' - requrired for external JMX monitoring
 	# 'jdk.httpserver' - required for Plan <https://github.com/plan-player-analytics/Plan>
-	&& JDEPS=jdk.zipfs,jdk.crypto.ec,java.scripting,jdk.management,jdk.management.agent,jdk.httpserver,$(jdeps --ignore-missing-deps --list-deps --multi-release 14 app.jar 2.app.jar | awk -F'/' '{print $1}' | tr -d '[[:blank:]]' | sed ':a;N;$!ba;s/\n/,/g') \
+	&& JDEPS=jdk.zipfs,jdk.crypto.ec,java.scripting,jdk.management,jdk.management.agent,jdk.httpserver,$(jdeps -q --ignore-missing-deps --list-deps --multi-release 14 app.jar 2.app.jar | awk -F'/' '{print $1}' | tr -d '[[:blank:]]' | sed ':a;N;$!ba;s/\n/,/g') \
 	&& echo "Found deps: $JDEPS" \
 	# Set java option to prevent 'exec spawn helper' error > https://stackoverflow.com/questions/61301818/java-failed-to-exec-spawn-helper-error-since-moving-to-java-14-on-linux
 	&& _JAVA_OPTIONS="-Djdk.lang.Process.launchMechanism=vfork" jlink  --no-header-files --no-man-pages --compress=2 --strip-debug --module-path /opt/java/openjdk/jmods --add-modules $JDEPS --output /jlinked
 
+
+FROM golang:1.16.7-alpine as dltool-builder
+
+WORKDIR /src
+
+COPY dltool/ .
+
+# Build dltool and make sure it runs properly
+RUN go build -ldflags "-s -w" -o /dist/dltool; \
+	/dist/dltool
 
 # Based on "docker.io/jcxldn/openjdk-alpine:14-jre", but without java.
 
@@ -160,11 +170,12 @@ RUN export GLIBC_VERSION="2.31-r1"; \
 		rm -rf /tmp/zlib; \
 		
 		# PaperMC Base
-		apk add --no-cache ca-certificates wget jq; \ 
+		apk add --no-cache ca-certificates wget; \ 
 		chmod +x /runner/entrypoint; \
 		chmod +x /runner/runner;
 
 COPY --from=jlink /jlinked /opt/jdk/
+COPY --from=dltool-builder /dist/dltool /usr/local/bin
 
 ENV PATH="/opt/jdk/bin:${PATH}"
 

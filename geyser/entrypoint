@@ -5,14 +5,12 @@
 # /runner/entrypoint
 # ------------------------------
 
-
 # default auto-updating JAR path.
 JAR_PATH="/runner/app.jar"
 
-# default repository branch to download from
-BRANCH="master"
-
 JVM_OPTS="$@ $JVM_OPTS "
+
+echo "entrypoint > In directory: '$(pwd)'"
 
 echo "entrypoint > Found JVM Options: '$JVM_OPTS'"
 echo "entrypoint > Found Application Options: '$APP_OPTS'"
@@ -21,28 +19,30 @@ echo "entrypoint > Welcome!"
 
 echo "entrypoint > Checking if OVERRIDE_JAR_PATH env variable was set..."
 
-if [ ! -z "$OVERRIDE_JAR_PATH" ];
+if [ ! -z ${OVERRIDE_JAR_PATH} ];
 then
 	# Variable was set, skip the download and pass the variable to the runner.
-	echo "entrypoint > OVERRIDE_JAR_PATH found! ('${OVERRIDE_JAR_PATH}') Starting..."
+	echo "entrypoint > OVERRIDE_JAR_PATH found! ('${OVERRIDE_JAR_PATH}') Starting... (in directory '$(pwd)')"
 	JAR_PATH=$OVERRIDE_JAR_PATH
 	# source runner to pass through env vars
 	. /runner/runner
 else
+	echo "entrypoint > Checking if the OVERRIDE_BRANCH env variable was set..."
 
-	# Check if an override branch was set
-	
-	echo "entrypoint > Checking if OVERRIDE_BRANCH env variable was set..."
-	
-	if [ ! -z "$OVERRIDE_BRANCH" ];
+	if [ -z ${OVERRIDE_BRANCH} ];
 	then
-		# Variable was set
-		echo "entrypoint > OVERRIDE_BRANCH found! ('${OVERRIDE_BRANCH}')"
-		BRANCH=$OVERRIDE_BRANCH
+		# Variable is not set.
+		echo "entrypoint > Variable not set, querying for default branch..."
+		DEFAULT_BRANCH=$(dltool latestmc geyser)
+		echo "entrypoint > Found branch $DEFAULT_BRANCH! Downloading latest build..."
+	else
+		# Variable is set.
+		echo "entrypoint > Override Variable set! Using overridden branch $OVERRIDE_BRANCH"
+		DEFAULT_BRANCH=$OVERRIDE_BRANCH
 	fi
 	
 	echo "entrypoint > Checking if the OVERRIDE_JAR_DL_PATH env variable was set..."
-
+	
 	if [ -z ${OVERRIDE_JAR_DL_PATH} ];
 	then
 		# Variable is not set
@@ -52,15 +52,11 @@ else
 		echo "entrypoint > Override Variable set! Using overriden JAR download path '$OVERRIDE_JAR_DL_PATH'"
 		JAR_PATH=$OVERRIDE_JAR_DL_PATH	
 	fi
-
-	echo "entrypoint > Downloading latest build... (branch: '$BRANCH')"
 	
-	# echo "debug > '$(echo "${BRANCH}" | sed -f /runner/url_escape.sed)'"
-
-	wget -q -O $JAR_PATH https://ci.nukkitx.com/job/GeyserMC/job/Geyser/job/$(echo "${BRANCH}" | sed -f /runner/url_escape.sed)/lastSuccessfulBuild/artifact/bootstrap/standalone/target/Geyser.jar
+	wget -q -O $JAR_PATH $(dltool download geyser $DEFAULT_BRANCH)
 
 	if [ $? -eq 0 ]; then
-		echo "entrypoint > Successfully downloaded! Starting..."
+		echo "entrypoint > Successfully downloaded! Starting... (in directory '$(pwd)')"
 		echo ""
 		# source runner to pass through env vars
 		. /runner/runner

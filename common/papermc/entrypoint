@@ -33,7 +33,7 @@ else
 	then
 		# Variable is not set.
 		echo "entrypoint > Variable not set, querying for latest supported minecraft version..."
-		LATEST_MC=$(wget -q -O- $API_URL/api/v1/$PRODUCT | jq ".versions[0]" | sed 's/"//g')
+		LATEST_MC=$(dltool latestmc $PRODUCT)
 		echo "entrypoint > Found version $LATEST_MC! Downloading latest build..."
 	else
 		# Variable is set.
@@ -53,7 +53,7 @@ else
 		JAR_PATH=$OVERRIDE_JAR_DL_PATH	
 	fi
 	
-	wget -q -O $JAR_PATH $API_URL/api/v1/$PRODUCT/$LATEST_MC/latest/download
+	wget -q -O $JAR_PATH $(dltool download $PRODUCT $LATEST_MC)
 
 	if [ $? -eq 0 ]; then
 		echo "entrypoint > Successfully downloaded! Starting... (in directory '$(pwd)')"
