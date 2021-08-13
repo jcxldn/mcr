@@ -33,7 +33,7 @@ else
 	then
 		# Variable is not set.
 		echo "entrypoint > Variable not set, querying for latest supported minecraft version..."
-		LATEST_MC=$(dltool latestmc $PLATFORM)
+		LATEST_MC=$(dltool latestmc $PRODUCT)
 		echo "entrypoint > Found version $LATEST_MC! Downloading latest build..."
 	else
 		# Variable is set.
