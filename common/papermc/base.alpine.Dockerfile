@@ -18,6 +18,14 @@ RUN java -Xshare:dump \
 	&& _JAVA_OPTIONS="-Djdk.lang.Process.launchMechanism=vfork" jlink  --no-header-files --no-man-pages --compress=2 --strip-debug --module-path /opt/java/openjdk/jmods --add-modules $JDEPS --output /jlinked
 
 
+FROM golang:1.16.7-alpine as dltool-builder
+
+WORKDIR /src
+
+COPY dltool/ .
+
+RUN go build -ldflags "-s -w" -o /dist/dltool
+
 # Based on "docker.io/jcxldn/openjdk-alpine:14-jre", but without java.
 
 FROM alpine:3.12
@@ -160,11 +168,12 @@ RUN export GLIBC_VERSION="2.31-r1"; \
 		rm -rf /tmp/zlib; \
 		
 		# PaperMC Base
-		apk add --no-cache ca-certificates wget jq; \ 
+		apk add --no-cache ca-certificates wget; \ 
 		chmod +x /runner/entrypoint; \
 		chmod +x /runner/runner;
 
 COPY --from=jlink /jlinked /opt/jdk/
+COPY --from=dltool-builder /dist/dltool /usr/local/bin
 
 ENV PATH="/opt/jdk/bin:${PATH}"
 
