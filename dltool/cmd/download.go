@@ -23,6 +23,9 @@ var downloadCmd = &cobra.Command{
 			fmt.Println(purpur.GetLatestBuildDownloadLinkForVersion(args[1]))
 		case "velocity":
 			fmt.Println(velocity.GetLatestDownloadLinkForVersion(args[1]))
+		case "geyser":
+			// Only one line needed so not in it's own package
+			fmt.Printf("https://ci.opencollab.dev/job/GeyserMC/job/Geyser/job/%s/lastSuccessfulBuild/artifact/bootstrap/standalone/target/Geyser.jar\n", args[1])
 		default:
 			fmt.Println("unknown platform")
 		}
