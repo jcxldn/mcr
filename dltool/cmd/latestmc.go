@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/Prouser123/minecraft-runner-docker/dltool/v2/providers/papermc"
+	"github.com/Prouser123/minecraft-runner-docker/dltool/v2/providers/purpur"
 	"github.com/spf13/cobra"
 )
 
@@ -18,6 +19,8 @@ var latestmcCmd = &cobra.Command{
 			fmt.Println(papermc.GetLatestVersion("paper"))
 		case "waterfall":
 			fmt.Println(papermc.GetLatestVersion("waterfall"))
+		case "purpur":
+			fmt.Println(purpur.GetLatestVersion())
 		default:
 			fmt.Println("unknown platform")
 		}

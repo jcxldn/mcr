@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/Prouser123/minecraft-runner-docker/dltool/v2/providers/papermc"
+	"github.com/Prouser123/minecraft-runner-docker/dltool/v2/providers/purpur"
 	"github.com/spf13/cobra"
 )
 
@@ -17,6 +18,8 @@ var downloadCmd = &cobra.Command{
 			fmt.Println(papermc.GetLatestBuildDownloadLinkForVersion("paper", args[1]))
 		case "waterfall":
 			fmt.Println(papermc.GetLatestBuildDownloadLinkForVersion("waterfall", args[1]))
+		case "purpur":
+			fmt.Println(purpur.GetLatestBuildDownloadLinkForVersion(args[1]))
 		default:
 			fmt.Println("unknown platform")
 		}
