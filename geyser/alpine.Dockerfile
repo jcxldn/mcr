@@ -4,12 +4,22 @@ FROM jcxldn/openjdk-alpine:16-jdk as jlink
 # Recreate CDS Cache
 RUN java -Xshare:dump \
 	&& apk add --no-cache ca-certificates binutils \
-	&& wget -O app.jar https://ci.nukkitx.com/job/GeyserMC/job/Geyser/job/master/lastSuccessfulBuild/artifact/bootstrap/standalone/target/Geyser.jar \
+	&& wget -O app.jar https://ci.opencollab.dev/job/GeyserMC/job/Geyser/job/master/lastSuccessfulBuild/artifact/bootstrap/standalone/target/Geyser.jar \
 	&& JDEPS=jdk.crypto.ec,$(jdeps --ignore-missing-deps --list-deps --multi-release 14 app.jar | awk -F'/' '{print $1}' | tr -d '[[:blank:]]' | sed ':a;N;$!ba;s/\n/,/g') \
 	&& echo "Found deps: $JDEPS" \
 	# Set java option to prevent 'exec spawn helper' error > https://stackoverflow.com/questions/61301818/java-failed-to-exec-spawn-helper-error-since-moving-to-java-14-on-linux
 	&& _JAVA_OPTIONS="-Djdk.lang.Process.launchMechanism=vfork" jlink  --no-header-files --no-man-pages --compress=2 --strip-debug --module-path /opt/java/openjdk/jmods --add-modules $JDEPS --output /jlinked
 
+
+FROM golang:1.16.7-alpine as dltool-builder
+
+WORKDIR /src
+
+COPY dltool/ .
+
+# Build dltool and make sure it runs properly
+RUN go build -ldflags "-s -w" -o /dist/dltool; \
+	/dist/dltool
 
 # Based on "docker.io/jcxldn/openjdk-alpine:14-jre", but without java.
 
@@ -17,8 +27,6 @@ FROM alpine:3.12
 
 COPY geyser/entrypoint /runner/entrypoint
 COPY common/papermc/runner /runner/runner
-
-COPY geyser/url_escape.sed /runner/url_escape.sed
 
 # Add glibc
 RUN export GLIBC_VERSION="2.31-r1"; \
@@ -116,7 +124,7 @@ RUN export GLIBC_VERSION="2.31-r1"; \
 		strip /usr/glibc-compat/lib/*/* || echo 'Probably done with errors'; \
 		
 		# Remove unused files (https://github.com/sgerrand/alpine-pkg-glibc/blob/master/APKBUILD)
-		rm "$pkgdir"/usr/glibc-compat/etc/rpc; \
+		rm /usr/glibc-compat/etc/rpc; \
 		rm -rf /usr/glibc-compat/bin; \
 		rm -rf /usr/glibc-compat/sbin; \
 		rm -rf /usr/glibc-compat/lib/gconv; \
@@ -142,6 +150,7 @@ RUN export GLIBC_VERSION="2.31-r1"; \
 		chmod +x /runner/runner;
 
 COPY --from=jlink /jlinked /opt/jdk/
+COPY --from=dltool-builder /dist/dltool /usr/local/bin
 
 ENV PATH="/opt/jdk/bin:${PATH}"
 
