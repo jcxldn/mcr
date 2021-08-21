@@ -53,7 +53,15 @@ else
 		JAR_PATH=$OVERRIDE_JAR_DL_PATH	
 	fi
 	
-	wget -q -O $JAR_PATH $(dltool download $PRODUCT $LATEST_MC)
+	# Flag breakdown
+	# ----------
+	# --timeout=30 - 30 second timeout
+	# --tries=5 - retry up to 5 times after timeout
+	# --retry-connrefused - Attempt to retry even if connection was refused (eg. webserver restarting)
+	# --show-progress - always show progress bar (even with -q)
+	# -q - quiet (no output)
+	# -O - output to file $JAR_PATH
+	wget --timeout=30 --tries=5 --retry-connrefused --show-progress -q -O $JAR_PATH $(dltool download $PRODUCT $LATEST_MC)
 
 	if [ $? -eq 0 ]; then
 		echo "entrypoint > Successfully downloaded! Starting... (in directory '$(pwd)')"
