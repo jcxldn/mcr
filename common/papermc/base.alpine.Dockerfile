@@ -1,5 +1,5 @@
 # jdk required for jlink to find required modules.
-FROM jcxldn/openjdk-alpine:16-jdk as jlink
+FROM jcxldn/openjdk-alpine:17-jdk as jlink
 
 # Recreate CDS Cache
 RUN java -Xshare:dump \
@@ -19,7 +19,7 @@ RUN java -Xshare:dump \
 	&& _JAVA_OPTIONS="-Djdk.lang.Process.launchMechanism=vfork" jlink  --no-header-files --no-man-pages --compress=2 --strip-debug --module-path /opt/java/openjdk/jmods --add-modules $JDEPS --output /jlinked
 
 
-FROM golang:1.16.7-alpine as dltool-builder
+FROM golang:1.17.6-alpine as dltool-builder
 
 WORKDIR /src
 
@@ -31,7 +31,7 @@ RUN go build -ldflags "-s -w" -o /dist/dltool; \
 
 # Based on "docker.io/jcxldn/openjdk-alpine:14-jre", but without java.
 
-FROM alpine:3.12
+FROM alpine:3.15
 
 COPY common/papermc/entrypoint /runner/entrypoint
 COPY common/papermc/runner /runner/runner
