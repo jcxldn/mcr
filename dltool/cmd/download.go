@@ -5,6 +5,7 @@ import (
 
 	"net/url"
 
+	"github.com/Prouser123/minecraft-runner-docker/dltool/v2/providers/fabricmc"
 	"github.com/Prouser123/minecraft-runner-docker/dltool/v2/providers/papermc"
 	"github.com/Prouser123/minecraft-runner-docker/dltool/v2/providers/purpur"
 	"github.com/Prouser123/minecraft-runner-docker/dltool/v2/providers/velocity"
@@ -28,6 +29,8 @@ var downloadCmd = &cobra.Command{
 		case "geyser":
 			// Only one line needed so not in it's own package
 			fmt.Printf("https://ci.opencollab.dev/job/GeyserMC/job/Geyser/job/%s/lastSuccessfulBuild/artifact/bootstrap/standalone/target/Geyser.jar\n", url.PathEscape(args[1]))
+		case "fabric":
+			fmt.Println(fabricmc.ConstructDownloadUrl(args[1]))
 		default:
 			fmt.Println("unknown platform")
 		}
