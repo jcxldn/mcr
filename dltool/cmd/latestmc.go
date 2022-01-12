@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/Prouser123/minecraft-runner-docker/dltool/v2/providers/fabricmc"
 	"github.com/Prouser123/minecraft-runner-docker/dltool/v2/providers/papermc"
 	"github.com/Prouser123/minecraft-runner-docker/dltool/v2/providers/purpur"
 	"github.com/Prouser123/minecraft-runner-docker/dltool/v2/providers/velocity"
@@ -28,6 +29,8 @@ var latestmcCmd = &cobra.Command{
 			// Geyser doesn't use version strings instead always uses the latest build from X branch
 			// Only one line needed so not in it's own package
 			fmt.Println("master")
+		case "fabric":
+			fmt.Println(fabricmc.GetLatestVersion())
 		default:
 			fmt.Println("unknown platform")
 		}

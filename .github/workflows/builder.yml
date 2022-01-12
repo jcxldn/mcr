@@ -62,6 +62,13 @@ jobs:
             --platform linux/amd64,linux/arm64,linux/arm/v7 \
             --output "type=image,push=$([[ $GITHUB_REF == "refs/heads/master" ]] && echo true || echo false)" \
             -f velocity/alpine.Dockerfile -t jcxldn/minecraft-runner:velocity-alpine .
+      -
+        name: Run Buildx (fabric-alpine)
+        run: |
+          docker buildx build \
+            --platform linux/amd64,linux/arm64,linux/arm/v7 \
+            --output "type=image,push=$([[ $GITHUB_REF == "refs/heads/master" ]] && echo true || echo false)" \
+            -f velocity/fabric.Dockerfile -t jcxldn/minecraft-runner:fabric-alpine .
   geyser-alpine:
     runs-on: ubuntu-latest
     steps:
