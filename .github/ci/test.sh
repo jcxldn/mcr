@@ -13,7 +13,7 @@ echo "::group::Starting container"
 # WSL refuses to create this if the extension is .log, so we're using log.txt instead
 echo > test.log.txt
 
-screen -L -Logfile test.log.txt -d -m -S container-test docker run -it --rm jcxldn/minecraft-runner:waterfall-alpine
+screen -L -Logfile test.log.txt -d -m -S container-test docker run -it --rm $1
 
 # Set flush time to 0secs
 screen -r container-test -X colon "logfile flush 0^M"
