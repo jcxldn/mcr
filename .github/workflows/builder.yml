@@ -143,4 +143,4 @@ jobs:
         uses: actions/checkout@v1
       -
         name: Run testing script
-        run: cd .github/ci && chmod +x test.sh && ./test.sh jcxldn/minecraft-runner:${{ matrix.tag }} "${{ matrix.pattern }}""
+        run: cd .github/ci && chmod +x test.sh && ./test.sh jcxldn/minecraft-runner:${{ matrix.tag }} "${{ matrix.pattern }}"
