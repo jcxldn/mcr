@@ -21,6 +21,10 @@ screen -r container-test -X colon "logfile flush 0^M"
 tail -f -n0 test.log.txt &
 PID=$!
 
+# tail from coreutils 8.28+ required!
+# otherwise grep will never terminate
+# src: (patch) https://git.savannah.gnu.org/cgit/coreutils.git/commit/?id=v8.27-42-gce0415f
+# src: (forum) https://superuser.com/a/1405010
 tail -f -n0 test.log.txt | grep -qe "$2"
 
 if [ $? == 0 ]; then

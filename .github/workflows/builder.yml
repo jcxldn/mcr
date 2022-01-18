@@ -126,6 +126,9 @@ jobs:
             -f fabric/alpine.Dockerfile -t jcxldn/minecraft-runner:fabric-alpine .
   test:
     runs-on: ubuntu-latest
+    # Run in an alpine container
+    container:
+      image: alpine:latest
     needs: ["papermc-alpine", "geyser-alpine"]
     strategy:
       matrix: 
@@ -142,5 +145,9 @@ jobs:
         name: Checkout
         uses: actions/checkout@v1
       -
+        name: Install coreutils (for tail), bash, screen & grep
+        # See test.sh for details: coreutils 8.28+ needed for grep to terminate
+        run: apk add --no-cache coreutils bash screen grep
+      - 
         name: Run testing script
         run: cd .github/ci && chmod +x test.sh && ./test.sh jcxldn/minecraft-runner:${{ matrix.tag }} "${{ matrix.pattern }}"
