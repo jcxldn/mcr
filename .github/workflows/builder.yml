@@ -126,28 +126,31 @@ jobs:
             -f fabric/alpine.Dockerfile -t jcxldn/minecraft-runner:fabric-alpine .
   test:
     runs-on: ubuntu-latest
-    # Run in an alpine container
-    container:
-      image: alpine:latest
     needs: ["papermc-alpine", "geyser-alpine"]
     strategy:
       matrix: 
-        # Specify servers with "Done (xyz)!" syntax
+        # Specify servers with shared syntax
         # fabric does not have automatic eula agree so it won't be tested initially.
-        tag: ["geyser-alpine", "paper-alpine", "purpur-alpine", "velocity-alpine"]
+        tag: ["paper-alpine", "purpur-alpine"]
         pattern: ["Done ("]
+        stopcmd: ["stop"]
         # Manually include servers with differing syntax
         include:
+          - tag: "geyser-alpine"
+            pattern: "Done ("
+            stopcmd: "geyser stop"
+          - tag: "velocity-alpine"
+            pattern: "Done ("
+            stopcmd: "end"
           - tag: "waterfall-alpine"
             pattern: "Listening on"
+            stopcmd: "end"
     steps:
       -
         name: Checkout
         uses: actions/checkout@v1
       -
-        name: Install coreutils (for tail), bash, screen & grep
-        # See test.sh for details: coreutils 8.28+ needed for grep to terminate
-        run: apk add --no-cache coreutils bash screen grep
-      - 
-        name: Run testing script
-        run: cd .github/ci && chmod +x test.sh && ./test.sh jcxldn/minecraft-runner:${{ matrix.tag }} "${{ matrix.pattern }}"
+        name: Run test script in container
+        # yaml syntax error if this is all done on one line
+        run: |
+            echo ::group::Creating docker container && docker run --rm --entrypoint sh -v $(pwd):/src -v /var/run/docker.sock:/var/run/docker.sock alpine:latest -c 'echo ::endgroup:: && echo ::group::Installing script dependencies && apk add --no-cache coreutils bash screen grep docker-cli && cd /src/.github/ci && chmod +x test.sh && echo ::endgroup:: && ./test.sh jcxldn/minecraft-runner:${{ matrix.tag }} "${{ matrix.pattern }}" "${{ matrix.stopcmd }}"'

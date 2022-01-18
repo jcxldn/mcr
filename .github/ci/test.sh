@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Usage: ./test.sh (tag) "<search pattern>"
-#    eg: ./test.sh jcxldn/minecraft-runner:waterfall-alpine "Listening on"
+# Usage: ./test.sh (tag) "<search pattern> <stopcmd>"
+#    eg: ./test.sh jcxldn/minecraft-runner:waterfall-alpine "Listening on" "end"
 
 echo "Found tag: '$1'"
 echo "Found search pattern: '$2'"
@@ -30,7 +30,7 @@ tail -f -n0 test.log.txt | grep -qe "$2"
 if [ $? == 0 ]; then
     echo -e "::endgroup::"
     echo -e "::group::Stopping container"
-    screen -S container-test -X stuff "end\n"
+    screen -S container-test -X stuff "$3\n"
 
     # Wait for the server to stop
     while screen -list | grep -q container-test
