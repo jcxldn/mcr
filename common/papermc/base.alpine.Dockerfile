@@ -16,7 +16,9 @@ RUN java -Xshare:dump \
 	# 'java.desktop' - (jdk17-waterfall) "java.beans" required by snakeyaml <at org.yaml.snakeyaml.constructor.BaseConstructor.getPropertyUtils(BaseConstructor.java:545)>
 	# 'java.sql' - (jdk17-waterfall) "java.sql" required by com.google.gson.Gson.<init>(Gson.java:265)
 	# 'jdk.unsupported' - sun.misc.Unsafe is now in this module - eg usage during fresh waterfall start: "sun.misc.Unsafe" required by com.lmax.disruptor.util.Util$1.run(Util.java:103)
-	&& JDEPS=jdk.zipfs,jdk.crypto.ec,java.scripting,jdk.management,jdk.management.agent,jdk.httpserver,jdk.security.auth,java.desktop,java.sql,jdk.unsupported,$(jdeps -q --ignore-missing-deps --list-deps --multi-release 14 app.jar 2.app.jar | awk -F'/' '{print $1}' | tr -d '[[:blank:]]' | sed ':a;N;$!ba;s/\n/,/g') \
+	# 'java.instrument' - Fixes warning: 'Unable to retrieve Instrumentation API to add Paper jar to classpath. [..]'
+	# 'java.xml' - needed as log4j calls it's XmlConfigurationFactory class during server boot
+	&& JDEPS=jdk.zipfs,jdk.crypto.ec,java.scripting,jdk.management,jdk.management.agent,jdk.httpserver,jdk.security.auth,java.desktop,java.sql,jdk.unsupported,java.instrument,java.xml$(jdeps -q --ignore-missing-deps --list-deps --multi-release 14 app.jar 2.app.jar | awk -F'/' '{print $1}' | tr -d '[[:blank:]]' | sed ':a;N;$!ba;s/\n/,/g') \
 	&& echo "Found deps: $JDEPS" \
 	# Set java option to prevent 'exec spawn helper' error > https://stackoverflow.com/questions/61301818/java-failed-to-exec-spawn-helper-error-since-moving-to-java-14-on-linux
 	&& _JAVA_OPTIONS="-Djdk.lang.Process.launchMechanism=vfork" jlink  --no-header-files --no-man-pages --compress=2 --strip-debug --module-path /opt/java/openjdk/jmods --add-modules $JDEPS --output /jlinked
