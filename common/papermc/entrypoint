@@ -17,6 +17,12 @@ echo "entrypoint > Found Application Options: '$APP_OPTS'"
 
 echo "entrypoint > Welcome! using product: $PRODUCT"
 
+if [ ! -z ${SHOULD_CREATE_EULA_TXT} ];
+then
+	echo "Creating eula.txt at $(pwd)/eula.txt"
+	echo "eula=true" > ./eula.txt
+fi
+
 echo "entrypoint > Checking if OVERRIDE_JAR_PATH env variable was set..."
 
 if [ ! -z ${OVERRIDE_JAR_PATH} ];

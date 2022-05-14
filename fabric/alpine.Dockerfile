@@ -182,7 +182,8 @@ COPY --from=jlink /jlinked /opt/jdk/
 COPY --from=dltool-builder /dist/dltool /usr/local/bin
 
 ENV PATH="/opt/jdk/bin:${PATH}" \
-    PRODUCT=fabric
+    PRODUCT=fabric \
+	SHOULD_CREATE_EULA_TXT=1
 
 WORKDIR /data
 
