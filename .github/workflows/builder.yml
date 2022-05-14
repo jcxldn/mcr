@@ -130,8 +130,7 @@ jobs:
     strategy:
       matrix: 
         # Specify servers with shared syntax
-        # fabric does not have automatic eula agree so it won't be tested initially.
-        tag: ["paper-alpine", "purpur-alpine"]
+        tag: ["paper-alpine", "purpur-alpine", "fabric-alpine"]
         pattern: ["Done ("]
         stopcmd: ["stop"]
         # Manually include servers with differing syntax
