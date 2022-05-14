@@ -126,7 +126,7 @@ jobs:
             -f fabric/alpine.Dockerfile -t jcxldn/minecraft-runner:fabric-alpine .
   test:
     runs-on: ubuntu-latest
-    needs: ["papermc-alpine", "geyser-alpine"]
+    needs: ["papermc-alpine", "geyser-alpine", "fabric-alpine"]
     strategy:
       matrix: 
         # Specify servers with shared syntax
