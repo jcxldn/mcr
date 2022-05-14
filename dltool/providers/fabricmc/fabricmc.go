@@ -2,6 +2,7 @@ package fabricmc
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/buger/jsonparser"
 	"github.com/go-resty/resty/v2"
@@ -18,14 +19,34 @@ func getVersion(m Module) string {
 		// HTTP 200 OK!
 
 		// This API returns an array of objects
-		// At the time of writing, the latest version string is at (data)[0].version
-		// (the first item in the array being the latest version for the module)
+		// At the time of writing, the version string is at (data)[i].version
+		// UPDATE: The API now returns snapshot versions, so we can no longer just return the first item in the array.
 
-		str, dataType, _, err := jsonparser.Get(resp.Body(), "[0]", "version")
-		// Make sure a) that there were no errors and b) that we have a string response type
-		if err == nil && dataType == jsonparser.String {
-			return string(str)
-		}
+		var version string
+		var stillSearching bool = true
+
+		// Let's iterate through each item until we come across one with stable: true
+		jsonparser.ArrayEach(resp.Body(), func(value []byte, _ jsonparser.ValueType, offset int, _ error) {
+			if stillSearching {
+				stableByte, dataType, _, err := jsonparser.Get(value, "stable")
+				if err == nil && dataType == jsonparser.Boolean {
+					stable, _ := strconv.ParseBool(string(stableByte))
+					if stable {
+						// We have a stable release! Get the version value andd return it.
+						str, dataType, _, err := jsonparser.Get(value, "version")
+						// Make sure a) that there were no errors and b) that we have a string response type
+						if err == nil && dataType == jsonparser.String {
+							// Set the version string
+							version = string(str)
+							// Set stillSearching to false to prevent another stable version from overwriting this one
+							// ('game' has multiple stable versions)
+							stillSearching = false
+						}
+					}
+				}
+			}
+		})
+		return version
 	}
 
 	// Fallback return
