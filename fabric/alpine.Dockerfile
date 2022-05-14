@@ -15,7 +15,8 @@ RUN java -Xshare:dump \
     # - 'java.sql' - JDBC API (also uses java.xml)
     # - 'java.naming' -  Java Naming and Directory Interface (JNDI) API
     #    - NOTE: 'java.naming' is not required for fabric to start, without it a warning will be displayed.
-    && JDEPS=java.base,jdk.zipfs,jdk.crypto.ec,java.xml,java.desktop,java.management,java.logging,java.sql,java.naming \
+	# - 'java.compiler' - Required for the Fabric API to load correctly (uses java.compiler/javax.annotation.processing.Messager)
+    && JDEPS=java.base,jdk.zipfs,jdk.crypto.ec,java.xml,java.desktop,java.management,java.logging,java.sql,java.naming,java.compiler \
 	&& echo "Using deps: $JDEPS" \
 	# Set java option to prevent 'exec spawn helper' error > https://stackoverflow.com/questions/61301818/java-failed-to-exec-spawn-helper-error-since-moving-to-java-14-on-linux
 	&& _JAVA_OPTIONS="-Djdk.lang.Process.launchMechanism=vfork" jlink  --no-header-files --no-man-pages --compress=2 --strip-debug --module-path /opt/java/openjdk/jmods --add-modules $JDEPS --output /jlinked
