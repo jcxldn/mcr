@@ -8,7 +8,7 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
-var baseUrl = "https://api.pl3x.net/v2/purpur"
+var baseUrl = "https://api.purpurmc.org/v2/purpur"
 
 var client *resty.Client = resty.New()
 
