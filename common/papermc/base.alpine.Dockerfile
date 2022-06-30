@@ -1,5 +1,5 @@
 # jdk required for jlink to find required modules.
-FROM jcxldn/openjdk-alpine:16-jdk as jlink
+FROM jcxldn/openjdk-alpine:17-jdk as jlink
 
 # Recreate CDS Cache
 RUN java -Xshare:dump \
@@ -12,23 +12,31 @@ RUN java -Xshare:dump \
 	# 'jdk.management' - required for Spark Profiler <https://github.com/lucko/spark>
 	# 'jdk.management.agent' - requrired for external JMX monitoring
 	# 'jdk.httpserver' - required for Plan <https://github.com/plan-player-analytics/Plan>
-	&& JDEPS=jdk.zipfs,jdk.crypto.ec,java.scripting,jdk.management,jdk.management.agent,jdk.httpserver,$(jdeps --ignore-missing-deps --list-deps --multi-release 14 app.jar 2.app.jar | awk -F'/' '{print $1}' | tr -d '[[:blank:]]' | sed ':a;N;$!ba;s/\n/,/g') \
+	# 'jdk.security.auth' - "Required for "root/admin user detection" re-added in PaperMC/Paper#6703 <https://github.com/PaperMC/Paper/pull/6703>
+	# 'java.desktop' - (jdk17-waterfall) "java.beans" required by snakeyaml <at org.yaml.snakeyaml.constructor.BaseConstructor.getPropertyUtils(BaseConstructor.java:545)>
+	# 'java.sql' - (jdk17-waterfall) "java.sql" required by com.google.gson.Gson.<init>(Gson.java:265)
+	# 'jdk.unsupported' - sun.misc.Unsafe is now in this module - eg usage during fresh waterfall start: "sun.misc.Unsafe" required by com.lmax.disruptor.util.Util$1.run(Util.java:103)
+	# 'java.instrument' - Fixes warning: 'Unable to retrieve Instrumentation API to add Paper jar to classpath. [..]'
+	# 'java.xml' - needed as log4j calls it's XmlConfigurationFactory class during server boot
+	&& JDEPS=jdk.zipfs,jdk.crypto.ec,java.scripting,jdk.management,jdk.management.agent,jdk.httpserver,jdk.security.auth,java.desktop,java.sql,jdk.unsupported,java.instrument,java.xml,$(jdeps -q --ignore-missing-deps --list-deps --multi-release 14 app.jar 2.app.jar | awk -F'/' '{print $1}' | tr -d '[[:blank:]]' | sed ':a;N;$!ba;s/\n/,/g') \
 	&& echo "Found deps: $JDEPS" \
 	# Set java option to prevent 'exec spawn helper' error > https://stackoverflow.com/questions/61301818/java-failed-to-exec-spawn-helper-error-since-moving-to-java-14-on-linux
 	&& _JAVA_OPTIONS="-Djdk.lang.Process.launchMechanism=vfork" jlink  --no-header-files --no-man-pages --compress=2 --strip-debug --module-path /opt/java/openjdk/jmods --add-modules $JDEPS --output /jlinked
 
 
-# mc-monitor go binary for docker healthchecking
-FROM golang:alpine as mcmonitor
+FROM golang:1.17.6-alpine as dltool-builder
 
-RUN apk add --no-cache git \
-    && git clone --depth 1 -b 0.8.0 https://github.com/itzg/mc-monitor \
-    && cd mc-monitor \
-    && GOOS=linux go build -ldflags="-s -w"
+WORKDIR /src
+
+COPY dltool/ .
+
+# Build dltool and make sure it runs properly
+RUN go build -ldflags "-s -w" -o /dist/dltool; \
+	/dist/dltool
 
 # Based on "docker.io/jcxldn/openjdk-alpine:14-jre", but without java.
 
-FROM alpine:3.12
+FROM alpine:3.15
 
 COPY common/papermc/entrypoint /runner/entrypoint
 COPY common/papermc/runner /runner/runner
@@ -169,13 +177,13 @@ RUN export GLIBC_VERSION="2.31-r1"; \
 		rm -rf /tmp/zlib; \
 		
 		# PaperMC Base
-		apk add --no-cache ca-certificates wget jq; \ 
+		apk add --no-cache ca-certificates wget; \ 
 		chmod +x /runner/entrypoint; \
 		chmod +x /runner/runner; \
 		chmod +x /runner/healthcheck;
 
 COPY --from=jlink /jlinked /opt/jdk/
-COPY --from=mcmonitor /go/mc-monitor/mc-monitor /sbin/
+COPY --from=dltool-builder /dist/dltool /usr/local/bin
 
 ENV PATH="/opt/jdk/bin:${PATH}"
 

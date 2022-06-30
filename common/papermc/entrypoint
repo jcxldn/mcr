@@ -17,9 +17,15 @@ echo "entrypoint > Found Application Options: '$APP_OPTS'"
 
 echo "entrypoint > Welcome! using product: $PRODUCT"
 
+if [ ! -z ${SHOULD_CREATE_EULA_TXT} ];
+then
+	echo "Creating eula.txt at $(pwd)/eula.txt"
+	echo "eula=true" > ./eula.txt
+fi
+
 echo "entrypoint > Checking if OVERRIDE_JAR_PATH env variable was set..."
 
-if [ ! -z"$OVERRIDE_JAR_PATH" ];
+if [ ! -z ${OVERRIDE_JAR_PATH} ];
 then
 	# Variable was set, skip the download and pass the variable to the runner.
 	echo "entrypoint > OVERRIDE_JAR_PATH found! ('${OVERRIDE_JAR_PATH}') Starting... (in directory '$(pwd)')"
@@ -33,7 +39,7 @@ else
 	then
 		# Variable is not set.
 		echo "entrypoint > Variable not set, querying for latest supported minecraft version..."
-		LATEST_MC=$(wget -q -O- $API_URL/api/v1/$PRODUCT | jq ".versions[0]" | sed 's/"//g')
+		LATEST_MC=$(dltool latestmc $PRODUCT)
 		echo "entrypoint > Found version $LATEST_MC! Downloading latest build..."
 	else
 		# Variable is set.
@@ -53,7 +59,15 @@ else
 		JAR_PATH=$OVERRIDE_JAR_DL_PATH	
 	fi
 	
-	wget -q -O $JAR_PATH $API_URL/api/v1/$PRODUCT/$LATEST_MC/latest/download
+	# Flag breakdown
+	# ----------
+	# --timeout=30 - 30 second timeout
+	# --tries=5 - retry up to 5 times after timeout
+	# --retry-connrefused - Attempt to retry even if connection was refused (eg. webserver restarting)
+	# --show-progress - always show progress bar (even with -q)
+	# -q - quiet (no output)
+	# -O - output to file $JAR_PATH
+	wget --timeout=30 --tries=5 --retry-connrefused --show-progress -q -O $JAR_PATH $(dltool download $PRODUCT $LATEST_MC)
 
 	if [ $? -eq 0 ]; then
 		echo "entrypoint > Successfully downloaded! Starting... (in directory '$(pwd)')"

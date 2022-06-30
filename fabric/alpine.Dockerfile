@@ -4,9 +4,20 @@ FROM jcxldn/openjdk-alpine:17-jdk as jlink
 # Recreate CDS Cache
 RUN java -Xshare:dump \
 	&& apk add --no-cache ca-certificates binutils \
-	&& wget -O app.jar https://ci.opencollab.dev/job/GeyserMC/job/Geyser/job/master/lastSuccessfulBuild/artifact/bootstrap/standalone/target/Geyser.jar \
-	&& JDEPS=jdk.crypto.ec,$(jdeps -q --ignore-missing-deps --list-deps --multi-release 14 app.jar | awk -F'/' '{print $1}' | tr -d '[[:blank:]]' | sed ':a;N;$!ba;s/\n/,/g') \
-	&& echo "Found deps: $JDEPS" \
+    # Required modules:
+    # - 'java.base' - Base Java implementation
+    # - 'jdk.zipfs' - File system provider for .zip and .jar files (required to read resources from .jar file)
+    # - 'jdk.crypto.ec' - required for proper SSL/TLS support. - https://stackoverflow.com/questions/55439599/sslhandshakeexception-with-jlink-created-runtime
+    # - 'java.xml' - Java XML API (fabric uses org.xml.sax)
+    # - 'java.desktop' - AWT/JavaBeans/etc - Java UI - Even with the nogui option fabric loads JavaBeans so this whole module is required
+    # - 'java.management' - JMX (JVM monitoring and management)
+    # - 'java.logging' - Java Logging API (Fabric loads this on startup in addition to log4j)
+    # - 'java.sql' - JDBC API (also uses java.xml)
+    # - 'java.naming' -  Java Naming and Directory Interface (JNDI) API
+    #    - NOTE: 'java.naming' is not required for fabric to start, without it a warning will be displayed.
+	# - 'java.compiler' - Required for the Fabric API to load correctly (uses java.compiler/javax.annotation.processing.Messager)
+    && JDEPS=java.base,jdk.zipfs,jdk.crypto.ec,java.xml,java.desktop,java.management,java.logging,java.sql,java.naming,java.compiler \
+	&& echo "Using deps: $JDEPS" \
 	# Set java option to prevent 'exec spawn helper' error > https://stackoverflow.com/questions/61301818/java-failed-to-exec-spawn-helper-error-since-moving-to-java-14-on-linux
 	&& _JAVA_OPTIONS="-Djdk.lang.Process.launchMechanism=vfork" jlink  --no-header-files --no-man-pages --compress=2 --strip-debug --module-path /opt/java/openjdk/jmods --add-modules $JDEPS --output /jlinked
 
@@ -25,7 +36,8 @@ RUN go build -ldflags "-s -w" -o /dist/dltool; \
 
 FROM alpine:3.15
 
-COPY geyser/entrypoint /runner/entrypoint
+# For ease of use let's use the papermc-common entrypoint & runner
+COPY common/papermc/entrypoint /runner/entrypoint
 COPY common/papermc/runner /runner/runner
 
 # Add glibc
@@ -139,12 +151,30 @@ RUN export GLIBC_VERSION="2.31-r1"; \
 		rm -rf /usr/glibc-compat/*/*.o; \
 		rm -rf /usr/glibc-compat/*/*.a; \
 		
+		# 08/08/2020 hotfix for waterfall - added libstdc++ and libgcc and symlink
+		# ----- Hotfix Start -----
+ 
+		# Install libs
+		apk add --no-cache libstdc++ libgcc; \
+		
+		# Strip libs to save space
+		strip /usr/lib/libstdc++.so.6; \
+		strip /usr/lib/libgcc_s.so.1; \
+		
+		# Link libs to other lib folders
+		ln -sfn /usr/lib/libstdc++.so.6 /usr/glibc-compat/lib; \
+		ln -sfn /usr/lib/libstdc++.so.6 /lib; \
+		
+		ln -sfn /usr/lib/libgcc_s.so.1 /usr/glibc-compat/lib; \
+		ln -sfn /usr/lib/libgcc_s.so.1 /lib; \
+		# ----- Hotfix End -----
+		
 		# Cleaning up...
 		apk del --purge .fetch-deps; \
 		rm -rf /var/cache/apk/*; \
 		rm -rf /tmp/zlib; \
 		
-		# Geyser Base
+		# PaperMC Base
 		apk add --no-cache ca-certificates wget; \ 
 		chmod +x /runner/entrypoint; \
 		chmod +x /runner/runner;
@@ -152,7 +182,9 @@ RUN export GLIBC_VERSION="2.31-r1"; \
 COPY --from=jlink /jlinked /opt/jdk/
 COPY --from=dltool-builder /dist/dltool /usr/local/bin
 
-ENV PATH="/opt/jdk/bin:${PATH}"
+ENV PATH="/opt/jdk/bin:${PATH}" \
+    PRODUCT=fabric \
+	SHOULD_CREATE_EULA_TXT=1
 
 WORKDIR /data
 

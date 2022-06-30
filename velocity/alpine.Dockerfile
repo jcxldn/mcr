@@ -1,4 +1,4 @@
 FROM jcxldn/minecraft-runner:base-papermc-alpine
 
-ARG PRODUCT=waterfall
+ARG PRODUCT=velocity
 ENV PRODUCT=$PRODUCT
