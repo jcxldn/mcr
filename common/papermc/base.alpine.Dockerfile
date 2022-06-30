@@ -40,6 +40,7 @@ FROM alpine:3.15
 
 COPY common/papermc/entrypoint /runner/entrypoint
 COPY common/papermc/runner /runner/runner
+COPY common/papermc/healthcheck /runner/healthcheck
 
 # Add glibc
 RUN export GLIBC_VERSION="2.31-r1"; \
@@ -178,7 +179,8 @@ RUN export GLIBC_VERSION="2.31-r1"; \
 		# PaperMC Base
 		apk add --no-cache ca-certificates wget; \ 
 		chmod +x /runner/entrypoint; \
-		chmod +x /runner/runner;
+		chmod +x /runner/runner; \
+		chmod +x /runner/healthcheck;
 
 COPY --from=jlink /jlinked /opt/jdk/
 COPY --from=dltool-builder /dist/dltool /usr/local/bin
@@ -188,6 +190,8 @@ ENV PATH="/opt/jdk/bin:${PATH}"
 WORKDIR /data
 
 ENTRYPOINT ["/runner/entrypoint"]
+
+HEALTHCHECK --start-period=1m CMD /runner/healthcheck
 
 # docker run [..] -v ./data:/data -Xmx1024M -Xms1024M
 # All optimizations and auto-updating jar included.

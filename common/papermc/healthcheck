@@ -1,0 +1,37 @@
+#!/bin/sh
+# ------------------------------
+# PaperMC Healthchecker
+#
+# /runner/healthcheck
+# ------------------------------
+
+if [ "$PRODUCT" != "waterfall" ];
+then
+    echo "Found paper-compatible platform!"
+    echo "Searching for server port..."
+
+    # eg given 'server-port=12345' returns '12345'
+    PORT=$(cat server.properties | grep server-port | cut -f2 -d=)
+
+    echo "Found port: $PORT"
+
+    # Step 2: Call mc-monitor
+    # Note: there is a -timeout flag but i'm not sure how well it works
+    /sbin/mc-monitor status -port $PORT
+    exit $?
+elif [ "$PRODUCT" == "waterfall" ];
+then
+    echo "Found waterfall-compatible platform!"
+    echo "Searching for server-port"
+    
+    # Waterfall uses yml for settings, so we installed yq in the waterfall layer
+    # Src: https://github.com/Prouser123/pterodactyl-eggs/blob/master/configs/mcr-waterfall-alpine.json#L12
+    PORT=$(yq e '.listeners[0].host' config.yml | cut -f2 -d:)
+
+    echo "Found port: $PORT"
+
+    # Step 2: Call mc-monitor
+    # Note: there is a -timeout flag but i'm not sure how well it works
+    /sbin/mc-monitor status -port $PORT
+    exit $?
+fi
