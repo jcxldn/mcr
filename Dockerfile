@@ -51,6 +51,6 @@ USER container
 ENV PATH="/opt/jdk/bin:${PATH}" \
     SHOULD_CREATE_EULA_TXT=1
 
-WORKDIR /data
+WORKDIR /home/container
 
 ENTRYPOINT ["/runner/entrypoint"]

@@ -6,7 +6,7 @@
 # ------------------------------
 
 # default auto-updating JAR path.
-JAR_PATH="/runner/app.jar"
+JAR_PATH="/home/container/app.jar"
 
 JVM_OPTS="$@ $JVM_OPTS "
 

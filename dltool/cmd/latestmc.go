@@ -27,7 +27,7 @@ var latestmcCmd = &cobra.Command{
 		case "geyser":
 			// Geyser doesn't use version strings instead always uses the latest build from X branch
 			// Only one line needed so not in it's own package
-			fmt.Println("master")
+			fmt.Println("latest")
 		case "fabric":
 			fmt.Println(fabricmc.GetLatestVersion())
 		default:
