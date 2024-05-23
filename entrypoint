@@ -1,6 +1,6 @@
 #!/bin/sh
 # ------------------------------
-# GeyserMC auto-updater
+# PaperMC auto-updater
 #
 # /runner/entrypoint
 # ------------------------------
@@ -15,7 +15,19 @@ echo "entrypoint > In directory: '$(pwd)'"
 echo "entrypoint > Found JVM Options: '$JVM_OPTS'"
 echo "entrypoint > Found Application Options: '$APP_OPTS'"
 
-echo "entrypoint > Welcome!"
+if [ -z ${OVERRIDE_VERSION} ];
+	# not set
+	echo "entrypoint > product not set!"
+	exit 2
+fi
+
+echo "entrypoint > Welcome! using product: $PRODUCT"
+
+if [ ! -z ${SHOULD_CREATE_EULA_TXT} ];
+then
+	echo "Creating eula.txt at $(pwd)/eula.txt"
+	echo "eula=true" > ./eula.txt
+fi
 
 echo "entrypoint > Checking if OVERRIDE_JAR_PATH env variable was set..."
 
@@ -27,18 +39,18 @@ then
 	# source runner to pass through env vars
 	. /runner/runner
 else
-	echo "entrypoint > Checking if the OVERRIDE_BRANCH env variable was set..."
+	echo "entrypoint > Checking if the OVERRIDE_VERSION env variable was set..."
 
-	if [ -z ${OVERRIDE_BRANCH} ];
+	if [ -z ${OVERRIDE_VERSION} ];
 	then
 		# Variable is not set.
-		echo "entrypoint > Variable not set, querying for default branch..."
-		DEFAULT_BRANCH=$(dltool latestmc geyser)
-		echo "entrypoint > Found branch $DEFAULT_BRANCH! Downloading latest build..."
+		echo "entrypoint > Variable not set, querying for latest supported minecraft version..."
+		LATEST_MC=$(dltool latestmc $PRODUCT)
+		echo "entrypoint > Found version $LATEST_MC! Downloading latest build..."
 	else
 		# Variable is set.
-		echo "entrypoint > Override Variable set! Using overridden branch $OVERRIDE_BRANCH"
-		DEFAULT_BRANCH=$OVERRIDE_BRANCH
+		echo "entrypoint > Override Variable set! Using overridden version $OVERRIDE_VERSION"
+		LATEST_MC=$OVERRIDE_VERSION
 	fi
 	
 	echo "entrypoint > Checking if the OVERRIDE_JAR_DL_PATH env variable was set..."
@@ -53,7 +65,15 @@ else
 		JAR_PATH=$OVERRIDE_JAR_DL_PATH	
 	fi
 	
-	wget -q -O $JAR_PATH $(dltool download geyser $DEFAULT_BRANCH)
+	# Flag breakdown
+	# ----------
+	# --timeout=30 - 30 second timeout
+	# --tries=5 - retry up to 5 times after timeout
+	# --retry-connrefused - Attempt to retry even if connection was refused (eg. webserver restarting)
+	# --show-progress - always show progress bar (even with -q)
+	# -q - quiet (no output)
+	# -O - output to file $JAR_PATH
+	wget --timeout=30 --tries=5 --retry-connrefused --show-progress -q -O $JAR_PATH $(dltool download $PRODUCT $LATEST_MC)
 
 	if [ $? -eq 0 ]; then
 		echo "entrypoint > Successfully downloaded! Starting... (in directory '$(pwd)')"
@@ -61,7 +81,7 @@ else
 		# source runner to pass through env vars
 		. /runner/runner
 	else
-		echo "entrypoint > Failed to download Geyser. Exiting..."
+		echo "entrypoint > Failed to download $PRODUCT. Exiting..."
 		exit 1
 	fi
 fi
