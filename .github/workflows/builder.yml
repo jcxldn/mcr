@@ -74,4 +74,4 @@ jobs:
         name: Run test script in container
         # yaml syntax error if this is all done on one line
         run: |
-            echo ::group::Creating docker container && docker run --rm --entrypoint sh -v $(pwd):/src -v /var/run/docker.sock:/var/run/docker.sock alpine:latest -c 'echo ::endgroup:: && echo ::group::Installing script dependencies && apk add --no-cache coreutils bash screen grep docker-cli && cd /src/.github/ci && chmod +x test.sh && echo ::endgroup:: && ./test.sh ghcr.io/jcxldn/mcr:latest "${{ matrix.product }} ${{ matrix.pattern }}" "${{ matrix.stopcmd }}"'
+            echo ::group::Creating docker container && docker run --rm --entrypoint sh -v $(pwd):/src -v /var/run/docker.sock:/var/run/docker.sock alpine:latest -c 'echo ::endgroup:: && echo ::group::Installing script dependencies && apk add --no-cache coreutils bash screen grep docker-cli && cd /src/.github/ci && chmod +x test.sh && echo ::endgroup:: && ./test.sh ghcr.io/jcxldn/mcr:latest "${{ matrix.product }}" "${{ matrix.pattern }}" "${{ matrix.stopcmd }}"'

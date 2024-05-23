@@ -1,8 +1,6 @@
 #!/bin/bash
 
-# Usage: ./test.sh (tag) "<product> <search pattern> <stopcmd>"
-# Usage: ./test.sh (tag) "<search pattern> <stopcmd>"
-#    eg: ./test.sh jcxldn/minecraft-runner:waterfall-alpine "Listening on" "end"
+# Usage: ./test.sh (tag) <product> <search pattern> <stopcmd>
 
 echo "Found tag: '$1'"
 echo "Found product: '$2'"
