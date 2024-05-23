@@ -1,4 +1,4 @@
-FROM ghcr.io/jcxldn/java:22-jdk-adoptium-musl
+FROM ghcr.io/jcxldn/java:22-jdk-adoptium-musl as jlink
 
 # Recreate CDS Cache
 RUN java -Xshare:dump \
