@@ -6,7 +6,6 @@ import (
 	"github.com/Prouser123/minecraft-runner-docker/dltool/v2/providers/fabricmc"
 	"github.com/Prouser123/minecraft-runner-docker/dltool/v2/providers/papermc"
 	"github.com/Prouser123/minecraft-runner-docker/dltool/v2/providers/purpur"
-	"github.com/Prouser123/minecraft-runner-docker/dltool/v2/providers/velocity"
 	"github.com/spf13/cobra"
 )
 
@@ -24,7 +23,7 @@ var latestmcCmd = &cobra.Command{
 		case "purpur":
 			fmt.Println(purpur.GetLatestVersion())
 		case "velocity":
-			fmt.Println(velocity.GetLatestVersion())
+			fmt.Println(papermc.GetLatestVersion("velocity"))
 		case "geyser":
 			// Geyser doesn't use version strings instead always uses the latest build from X branch
 			// Only one line needed so not in it's own package

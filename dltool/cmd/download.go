@@ -8,7 +8,6 @@ import (
 	"github.com/Prouser123/minecraft-runner-docker/dltool/v2/providers/fabricmc"
 	"github.com/Prouser123/minecraft-runner-docker/dltool/v2/providers/papermc"
 	"github.com/Prouser123/minecraft-runner-docker/dltool/v2/providers/purpur"
-	"github.com/Prouser123/minecraft-runner-docker/dltool/v2/providers/velocity"
 	"github.com/spf13/cobra"
 )
 
@@ -24,9 +23,9 @@ var downloadCmd = &cobra.Command{
 			fmt.Println(papermc.GetLatestBuildDownloadLinkForVersion("waterfall", args[1]))
 		case "purpur":
 			fmt.Println(purpur.GetLatestBuildDownloadLinkForVersion(args[1]))
-		case "velocity": // no work
+		case "velocity":
 			fmt.Println(papermc.GetLatestBuildDownloadLinkForVersion("velocity", args[1]))
-		case "geyser": // no work
+		case "geyser":
 			// Only one line needed so not in it's own package
 			fmt.Printf("https://download.geysermc.org/v2/projects/geyser/versions/%s/builds/latest/downloads/standalone\n", url.PathEscape(args[1]))
 		case "fabric":
