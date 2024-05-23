@@ -24,11 +24,11 @@ var downloadCmd = &cobra.Command{
 			fmt.Println(papermc.GetLatestBuildDownloadLinkForVersion("waterfall", args[1]))
 		case "purpur":
 			fmt.Println(purpur.GetLatestBuildDownloadLinkForVersion(args[1]))
-		case "velocity":
-			fmt.Println(velocity.GetLatestDownloadLinkForVersion(args[1]))
-		case "geyser":
+		case "velocity": // no work
+			fmt.Println(papermc.GetLatestBuildDownloadLinkForVersion("velocity", args[1]))
+		case "geyser": // no work
 			// Only one line needed so not in it's own package
-			fmt.Printf("https://ci.opencollab.dev/job/GeyserMC/job/Geyser/job/%s/lastSuccessfulBuild/artifact/bootstrap/standalone/target/Geyser.jar\n", url.PathEscape(args[1]))
+			fmt.Printf("https://download.geysermc.org/v2/projects/geyser/versions/%s/builds/latest/downloads/standalone\n", url.PathEscape(args[1]))
 		case "fabric":
 			fmt.Println(fabricmc.ConstructDownloadUrl(args[1]))
 		default:
