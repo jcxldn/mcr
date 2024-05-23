@@ -43,7 +43,10 @@ COPY runner /runner/runner
 # PaperMC Base, libstdc++ for spark
 RUN apk add --no-cache ca-certificates wget libstdc++; \ 
     chmod +x /runner/entrypoint; \
-    chmod +x /runner/runner;
+    chmod +x /runner/runner; \
+    adduser -D -h /home/container container;
+
+USER container
 
 ENV PATH="/opt/jdk/bin:${PATH}" \
     SHOULD_CREATE_EULA_TXT=1

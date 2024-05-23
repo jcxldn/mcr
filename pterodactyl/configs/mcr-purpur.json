@@ -1,0 +1,53 @@
+{
+    "meta": {
+        "version": "PTDL_v1"
+    },
+    "exported_at": "2020-07-13T06:53:00-00:00",
+    "name": "Purpur (Autoupdating v2.0)",
+    "author": "pterodactyl@jcxldn.net",
+    "description": "Purpur is a fork of Paper and Tuinity with the goal of providing new and interesting configuration options, which allow for creating a unique gameplay experience not seen anywhere else",
+    "image": "ghcr.io/jcxldn/mcr:pterodactyl",
+    "startup": "/runner/entrypoint -Djava.net.preferIPv4Stack=true -Dterminal.jline=false -Dterminal.ansi=true",
+    "config": {
+        "files": "{\r\n    \"server.properties\": {\r\n        \"parser\": \"properties\",\r\n        \"find\": {\r\n            \"server-ip\": \"0.0.0.0\",\r\n            \"server-port\": \"{{server.build.default.port}}\"\r\n        }\r\n    }\r\n}",
+        "startup": "{\r\n    \"done\": \")! For help, type \",\r\n    \"userInteraction\": [\r\n        \"Go to eula.txt for more info.\"\r\n    ]\r\n}",
+        "logs": "{}",
+        "stop": "stop"
+    },
+    "scripts": {
+    	"installation": {
+    		"script": "#!\/bin\/sh\r\necho \"no install script needed!\"\r\nexit 0",
+    		"container": "alpine:latest",
+    		"entrypoint": "sh"
+    	}
+    },
+    "variables": [
+        {
+            "name": "Platform",
+            "description": "The platform to use.",
+            "env_variable": "PLATFORM",
+            "default_value": "purpur",
+            "user_viewable": 0,
+            "user_editable": 0,
+            "rules": "nullable|string"
+        },
+        {
+            "name": "(Optional) Purpur version",
+            "description": "The version of purpur to download. \r\n\r\nLeave blank to always get the latest (stable) versions.",
+            "env_variable": "OVERRIDE_VERSION",
+            "default_value": "",
+            "user_viewable": 1,
+            "user_editable": 1,
+            "rules": "nullable|string|max:10"
+        },
+        {
+            "name": "(Optional) Override Jar Path",
+            "description": "Set this value to the path of a jar (/home/container/$X) to skip the automatic download and run it directly.",
+            "env_variable": "OVERRIDE_JAR_PATH",
+            "default_value": "",
+            "user_viewable": 1,
+            "user_editable": 1,
+            "rules": "nullable|string"
+        }
+    ]
+}

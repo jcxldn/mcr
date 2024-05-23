@@ -1,0 +1,53 @@
+{
+    "meta": {
+        "version": "PTDL_v1"
+    },
+    "exported_at": "2020-07-13T06:53:00-00:00",
+    "name": "Geyser (Autoupdating v2.0)",
+    "author": "pterodactyl@jcxldn.net",
+    "description": "Minecraft Bedrock <--> Java proxy.",
+    "image": "ghcr.io/jcxldn/mcr:pterodactyl",
+    "startup": "/runner/entrypoint -Djava.net.preferIPv4Stack=true -Dterminal.jline=false -Dterminal.ansi=true",
+    "config": {
+        "files": "{\r\n    \"config.yml\": {\r\n        \"parser\": \"yaml\",\r\n        \"find\": {\r\n            \"bedrock.address\": \"0.0.0.0\",\r\n            \"bedrock.port\": \"{{server.build.default.port}}\"\r\n        }\r\n    }\r\n}",
+        "startup": "{\r\n    \"done\": \")! Run /geyser help \",\r\n    \"userInteraction\": [\r\n        \"Go to eula.txt for more info.\"\r\n    ]\r\n}",
+        "logs": "{}",
+        "stop": "geyser stop"
+    },
+    "scripts": {
+    	"installation": {
+    		"script": "#!\/bin\/sh\r\necho \"no install script needed!\"\r\nexit 0",
+    		"container": "alpine:latest",
+    		"entrypoint": "sh"
+    	}
+    },
+    "variables": [
+        {
+            "name": "Platform",
+            "description": "The platform to use.",
+            "env_variable": "PLATFORM",
+            "default_value": "geyser",
+            "user_viewable": 0,
+            "user_editable": 0,
+            "rules": "nullable|string"
+        },
+        {
+            "name": "(Optional) Geyser version",
+            "description": "The version of geyser to download. \r\n\r\nLeave blank to always get the latest (stable) versions.",
+            "env_variable": "OVERRIDE_VERSION",
+            "default_value": "",
+            "user_viewable": 1,
+            "user_editable": 1,
+            "rules": "nullable|string|max:10"
+        },
+        {
+            "name": "(Optional) Override Jar Path",
+            "description": "Set this value to the path of a jar (/home/container/$X) to skip the automatic download and run it directly.",
+            "env_variable": "OVERRIDE_JAR_PATH",
+            "default_value": "",
+            "user_viewable": 1,
+            "user_editable": 1,
+            "rules": "nullable|string"
+        }
+    ]
+}

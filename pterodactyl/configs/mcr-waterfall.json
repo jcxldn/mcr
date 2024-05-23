@@ -1,0 +1,54 @@
+{
+    "meta": {
+        "version": "PTDL_v1"
+    },
+    "exported_at": "2020-07-13T06:53:00-00:00",
+    "name": "Waterfall (Autoupdating v2.0)",
+    "author": "pterodactyl@jcxldn.net",
+    "description": "High performance fork of the well-known BungeeCord server teleportation suite.",
+    "image": "ghcr.io/jcxldn/mcr:pterodactyl",
+    "startup": "/runner/entrypoint -Djava.net.preferIPv4Stack=true -Dterminal.jline=false -Dterminal.ansi=true",
+    "config": {
+        "_files_comment": "src: https://github.com/parkervcp/eggs/blob/21545c7478483910168c22d6f0cb02aa96c3cc1a/game_eggs/minecraft/proxy/java/velocity/egg-velocity.json#L22",
+        "files": "{\r\n    \"config.yml\": {\r\n        \"parser\": \"yaml\",\r\n        \"find\": {\r\n            \"listeners[0].host\": \"0.0.0.0:{{server.build.default.port}}\",\r\n            \"servers.*.address\": {\r\n                \"127.0.0.1\": \"{{config.docker.interface}}\",\r\n                \"localhost\": \"{{config.docker.interface}}\"\r\n            }\r\n        }\r\n    }\r\n}",
+        "startup": "{\r\n    \"done\": \"Listening on \",\r\n    \"userInteraction\": [\r\n        \"Listening on \/0.0.0.0:\"\r\n    ]\r\n}",
+        "logs": "{\r\n    \"custom\": false,\r\n    \"location\": \"proxy.log.0\"\r\n}",
+        "stop": "end"
+    },
+    "scripts": {
+    	"installation": {
+    		"script": "#!\/bin\/sh\r\necho \"no install script needed!\"\r\nexit 0",
+    		"container": "alpine:latest",
+    		"entrypoint": "sh"
+    	}
+    },
+    "variables": [
+        {
+            "name": "Platform",
+            "description": "The platform to use.",
+            "env_variable": "PLATFORM",
+            "default_value": "waterfall",
+            "user_viewable": 0,
+            "user_editable": 0,
+            "rules": "nullable|string"
+        },
+        {
+            "name": "(Optional) Velocity version",
+            "description": "The version of Velocity to download. \r\n\r\nLeave blank to always get the latest (stable) versions.",
+            "env_variable": "OVERRIDE_VERSION",
+            "default_value": "",
+            "user_viewable": 1,
+            "user_editable": 1,
+            "rules": "nullable|string|max:10"
+        },
+        {
+            "name": "(Optional) Override Jar Path",
+            "description": "Set this value to the path of a jar (/home/container/$X) to skip the automatic download and run it directly.",
+            "env_variable": "OVERRIDE_JAR_PATH",
+            "default_value": "",
+            "user_viewable": 1,
+            "user_editable": 1,
+            "rules": "nullable|string"
+        }
+    ]
+}
