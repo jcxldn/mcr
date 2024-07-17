@@ -15,7 +15,8 @@ COPY entrypoint /runner/entrypoint
 COPY runner /runner/runner
 
 # PaperMC Base, libstdc++ for spark
-RUN apk add --no-cache ca-certificates wget libstdc++; \ 
+# lm-sensors for CoreProtect (uses jSensors which loads glibc libsensors.so if not present)
+RUN apk add --no-cache ca-certificates wget libstdc++ lm-sensors-dev; \ 
     chmod +x /runner/entrypoint; \
     chmod +x /runner/runner; \
     adduser -D -h /home/container container;
