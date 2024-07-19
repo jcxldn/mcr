@@ -25,6 +25,8 @@ var downloadCmd = &cobra.Command{
 			fmt.Println(purpur.GetLatestBuildDownloadLinkForVersion(args[1]))
 		case "velocity":
 			fmt.Println(papermc.GetLatestBuildDownloadLinkForVersion("velocity", args[1]))
+		case "folia":
+			fmt.Println(papermc.GetLatestBuildDownloadLinkForVersion("folia", args[1]))
 		case "geyser":
 			// Only one line needed so not in it's own package
 			fmt.Printf("https://download.geysermc.org/v2/projects/geyser/versions/%s/builds/latest/downloads/standalone\n", url.PathEscape(args[1]))

@@ -24,6 +24,8 @@ var latestmcCmd = &cobra.Command{
 			fmt.Println(purpur.GetLatestVersion())
 		case "velocity":
 			fmt.Println(papermc.GetLatestVersion("velocity"))
+		case "folia":
+			fmt.Println(papermc.GetLatestVersion("folia"))
 		case "geyser":
 			// Geyser doesn't use version strings instead always uses the latest build from X branch
 			// Only one line needed so not in it's own package
