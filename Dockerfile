@@ -15,8 +15,9 @@ COPY entrypoint /runner/entrypoint
 COPY runner /runner/runner
 
 # PaperMC Base, libstdc++ for spark
+# libc6-compat for Velocity (https://github.com/PaperMC/velocity/commit/f67d85493ee709a52f3ee8cac4ece56af78afade)
 # lm-sensors for CoreProtect (uses jSensors which loads glibc libsensors.so if not present)
-RUN apk add --no-cache ca-certificates wget libstdc++ lm-sensors-dev; \ 
+RUN apk add --no-cache ca-certificates wget libstdc++ lm-sensors-dev libc6-compat; \ 
     chmod +x /runner/entrypoint; \
     chmod +x /runner/runner; \
     adduser -D -h /home/container container;
